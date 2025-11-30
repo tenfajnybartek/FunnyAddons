@@ -1,0 +1,6 @@
+name: FunnyAddons
+version: '1.0.0-SNAPSHOT'
+main: pl.tenfajnybartek.funnyaddons.base.FunnyAddons
+api-version: '1.21'
+authors: [ tenfajnybartek ]
+description: Plugin na gildie
