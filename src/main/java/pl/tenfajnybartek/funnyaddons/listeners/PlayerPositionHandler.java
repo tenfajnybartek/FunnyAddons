@@ -7,11 +7,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import pl.tenfajnybartek.funnyaddons.managers.PlayerPositionManager;
 
-public class PlayerPostionHandler implements Listener {
+public class PlayerPositionHandler implements Listener {
 
     private final PlayerPositionManager playerPositionManager;
 
-    public PlayerPostionHandler(PlayerPositionManager playerPositionManager) {
+    public PlayerPositionHandler(PlayerPositionManager playerPositionManager) {
         this.playerPositionManager = playerPositionManager;
     }
 

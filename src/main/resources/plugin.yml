@@ -3,4 +3,24 @@ version: '1.0.0-SNAPSHOT'
 main: pl.tenfajnybartek.funnyaddons.base.FunnyAddons
 api-version: '1.21'
 authors: [ tenfajnybartek ]
-description: Plugin na gildie
+description: Plugin na dodatki do pluginu FunnyGuilds
+depend: [FunnyGuilds]
+softdepend:
+  - Vault
+  - WorldGuard
+  - PlaceholderAPI
+  - DecentHolograms
+
+commands:
+  kupkordy:
+    aliases: [ buycoords ]
+    description: Kupowanie koordów innej gildii.
+  wolnemiejsce:
+    aliases: [ freespace ]
+    description: Wyświetla dostępne wolne koordynaty do założenia gildii.
+  fgaddonsreload:
+    aliases: [ fgareload ]
+    description: Przeładowanie config.yml
+  uprawnienia:
+    aliases: [ guprawnienia ]
+    description: Uprawnienia gildii

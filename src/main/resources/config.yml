@@ -1,0 +1,147 @@
+  # FunnyAddons - config.yml
+
+  #### KUPOWANIE KORDÓW ZA ITEMY: ###
+  # Nazwa przedmiotu, wymaganego do zakupu kordów.
+  item: EMERALD_BLOCK
+
+  # Ilość wymaganego przedmiotu.
+  amount: 64
+
+  # Wiadomości przy braku wymaganej liczby itemów.
+  # Dostępne zmienne: {AMOUNT} - ilość wymagana, pobierana z amount.
+  item-lack:
+    - ""
+    - "&cNie posiadasz tyle wymaganych przedmiotów!"
+    - "&cMusisz posiadać: &e{AMOUNT}x{ITEM} &c!"
+    - ""
+
+  # Wiadomość, gdy komendę wykonuje nie-gracz.
+  only-player: "&cTylko gracz może wykonać tę komendę!"
+
+  # Wiadomość przy poprawnym użyciu.
+  usage: "&ePoprawne użycie: /kupkordy <tag gildii>"
+
+  # Wiadomość, gdy tag gildii nie istnieje.
+  # Dostępna zmienna: {GUILD} - tag podany przez gracza.
+  error-tag-guild: "&cGildia o tagu &e{GUILD} &cnie istnieje!"
+
+  # Wiadomość, gdy gracz wpisze liczbę zamiast literowego tagu.
+  tag-number: "&cTag gildii nie może składać się z liczby!"
+
+  # Minimalna i maksymalna liczba liter tagu gildii.
+  tag-short: 3
+  tag-long: 4
+
+  # Wiadomość przy nieodpowiedniej liczbie liter tagu.
+  # Dostępne zmienne: {TAG-SHORT}, {TAG-LONG}
+  tag-short-long: "&cTag gildii musi mieć od &e{TAG-SHORT} &cdo &e{TAG-LONG} &cznaków!"
+
+  # Wiadomość, gdy gildia nie ma regionu.
+  no-region: "&cTa gildia nie posiada regionu!"
+
+  # Wiadomość, gdy region nie ma serca gildii.
+  no-heart: "&cTen region nie posiada serca gildii!"
+
+  # Wiadomości przy zakupie kordów gildii.
+  # Dostępne zmienne: {GUILD} - tag, {X}, {Z} - współrzędne serca gildii.
+  buy-cords:
+    - ""
+    - "&aPomyślnie zakupiłeś kordy gildii: &e{GUILD}"
+    - "&aKordy serca gildii: &eX: {X} Z: {Z}"
+    - ""
+
+  # Wiadomość przy przeładowywaniu configu.
+  reload: "&aPomyślnie przeładowano config!"
+
+  ### BOSSBAR ###
+  bossbar:
+    mode: BOSS_BAR      # Dostępne: BOSS_BAR, ACTION_BAR
+    runnable-time: 15   # co ile ticków (wartość w tickach - 20 = 1s)
+    progress-based-on-distance: true
+    messages:
+      MEMBER:
+        message: "&8** &aZnajdujesz sie na terenie swojej gildii &2{GUILD-TAG} - {GUILD-NAME} &8**"
+        color: GREEN
+        style: SOLID
+      ENEMY:
+        message: "&8** &cZnajdujesz sie na terenie obcej gildii &4{GUILD-TAG} - {GUILD-NAME} &8**"
+        color: RED
+        style: SOLID
+      ALLY:
+        message: "&8** &bZnajdujesz sie na terenie sojuszniczej gildii &3{GUILD-TAG} - {GUILD-NAME} &8**"
+        color: BLUE
+        style: SOLID
+
+  actionbar:
+    messages:
+      MEMBER: "&aZnajdujesz sie na terenie swojej gildii &2{GUILD-TAG} &8(&f{DISTANCE}m&8)"
+      ENEMY:  "&cZnajdujesz sie na terenie obcej gildii &4{GUILD-TAG} &8(&f{DISTANCE}m&8)"
+      ALLY:   "&bZnajdujesz sie na terenie sojuszniczej gildii &3{GUILD-TAG} &8(&f{DISTANCE}m&8)"
+
+  ### SZUKANIE WOLNEGO MIEJSCA NA GILDIE ###
+  bound:
+    min: -1000 # Minimalny koordynat do generowania
+    max: 1000  # Maksymalny koordynat
+
+  listSize: 10 # Ilosc lokalizacji ile moze byc w /wolnemiejsce
+  generationTime: 10 # 1 = 1 sekunda
+
+  # ---------------------------
+  # SCALONA SEKCJA 'messages'
+  # Używaj configManager.getMessage("klucz") lub convenience getterów w ConfigManager
+  # ---------------------------
+  messages:
+    # ogólne / komunikaty
+    in-guild-message: "&cMusisz być w gildii, aby użyć tej komendy!"
+    no-permission: "&cNie masz uprawnień do zarządzania uprawnieniami gildii!"
+    no-region: "&cGildia lub region nie odnaleziony!"
+
+    # wolne miejsce / free-space
+    free-space-message: "Lista wolnych lokalizacji na gildie"
+    location-list-message: "x: {X}, z: {Z} - odleglosc {DISTANCE} metrow."
+    # fallback (kompatybilność ze starymi kluczami)
+    locationList: "x: {X}, z: {Z} - odleglosc {DISTANCE} metrow."
+
+    # buy-cords (jeżeli gdzieś w kodzie oczekiwano messages.buy-cords)
+    buy-cords:
+      - ""
+      - "&aPomyślnie zakupiłeś kordy gildii: &e{GUILD}"
+      - "&aKordy serca gildii: &eX: {X} Z: {Z}"
+      - ""
+
+    # GUI i potwierdzenia uprawnień
+    perms-given: "&aNadano uprawnienie &e{PERM} &agraczowi &e{PLAYER} &aw gildii &e{GUILD}"
+    perms-revoked: "&cOdebrano uprawnienie &e{PERM} &cgraczowi &e{PLAYER} &cw gildii &e{GUILD}"
+    perms-toggle: "&ePrzełączono uprawnienie &6{PERM} &edla &f{PLAYER}&e - teraz: &a{STATE}"
+    perms-opened: "&aOtworzono panel uprawnień gildii &e{GUILD}"
+
+  # ---------------------------
+  # UPRAWNIENIA (permissions module)
+  # ---------------------------
+  permissions:
+    gui:
+      members-title: "Gildia: {GUILD} - członkowie"         # tytuł inventory z listą członków
+      member-perms-title: "Uprawnienia: {GUILD} - {NAME}"  # tytuł inventory z uprawnieniami danego gracza
+      size-row: 1                                         # ile wierszy GUI na listę (1 = 9 slotów)
+
+    icons:
+      break: DIAMOND_PICKAXE    # materiał wyświetlany dla opcji BREAK
+      place: OAK_PLANKS         # materiał dla PLACE
+      open_chest: CHEST         # materiał dla OPEN_CHEST
+      pvp: IRON_SWORD           # materiał dla PVP
+      back: BARRIER             # materiał dla przycisku powrotu
+
+    defaults:
+      # Domyślne uprawnienia nadawane członkom nowo tworzonej gildii (opcjonalne).
+      # Nazwy zgadzają się z PermissionType (BREAK, PLACE, OPEN_CHEST, PVP)
+      member: []
+      officer:
+        - BREAK
+        - PLACE
+        - OPEN_CHEST
+      owner:
+        - BREAK
+        - PLACE
+        - OPEN_CHEST
+        - PVP
+    ```

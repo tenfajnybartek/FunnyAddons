@@ -1,4 +1,6 @@
 package pl.tenfajnybartek.funnyaddons.utils;
 
-public class GuildTerrainBarMode {
+public enum GuildTerrainBarMode {
+
+    ACTION_BAR, BOSS_BAR
 }
