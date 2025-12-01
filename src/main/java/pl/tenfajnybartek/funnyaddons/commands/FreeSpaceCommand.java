@@ -30,17 +30,24 @@ public class FreeSpaceCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, String[] strings) {
-        if (!(commandSender instanceof Player player)) return true;
+    public boolean onCommand(@NotNull CommandSender commandSender,
+                             @NotNull Command command,
+                             @NotNull String label,
+                             String[] args) {
+        if (!(commandSender instanceof Player player)) {
+            ChatUtils.sendMessage(commandSender, "&cTylko gracz może użyć tej komendy!");
+            return true;
+        }
 
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(player).orNull();
         if (user != null && user.hasGuild()) {
-            ChatUtils.sendMessage(player, config.getMessage("in-guild-message"));
+            ChatUtils.sendMessage(player, config.getInGuildMessage());
             return true;
         }
 
         List<Location> locations = addon.getLocationList();
         RegionManager regionManager = FunnyGuilds.getInstance().getRegionManager();
+
         Iterator<Location> iterator = locations.iterator();
         while (iterator.hasNext()) {
             Location loc = iterator.next();
@@ -49,12 +56,14 @@ public class FreeSpaceCommand implements CommandExecutor {
             }
         }
 
-        ChatUtils.sendMessage(player, config.getMessage("free-space-message"));
+        ChatUtils.sendMessage(player, config.getFreeSpaceMessage());
+
+        String pattern = config.getLocationListMessage();
 
         for (Location location : locations) {
-            String msg = config.getMessage("locationList")
-                    .replace("{X}", String.valueOf(location.getX()))
-                    .replace("{Z}", String.valueOf(location.getZ()))
+            String msg = pattern
+                    .replace("{X}", String.valueOf(location.getBlockX()))
+                    .replace("{Z}", String.valueOf(location.getBlockZ()))
                     .replace("{DISTANCE}", String.valueOf(LocationUtils.getDistanceToLocation(location, player)));
             ChatUtils.sendMessage(player, msg);
         }

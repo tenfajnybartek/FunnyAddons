@@ -122,15 +122,18 @@ public final class FunnyAddons extends JavaPlugin {
         PlayerPositionManager playerPositionManager = new PlayerPositionManager();
         BossBarManager bossBarManager = new BossBarManager();
 
+        GuildTerrainBarRunnable terrainBarRunnable =
+                new GuildTerrainBarRunnable(configManager, playerPositionManager, bossBarManager);
+
         getServer().getScheduler().runTaskTimerAsynchronously(
                 this,
-                new GuildTerrainBarRunnable(configManager, playerPositionManager, bossBarManager),
+                terrainBarRunnable,
                 configManager.getBossBarRunnableTime(),
                 configManager.getBossBarRunnableTime()
         );
 
         getServer().getPluginManager().registerEvents(
-                new GuildTerrainBarJoinListener(configManager, playerPositionManager, bossBarManager),
+                new GuildTerrainBarJoinListener(playerPositionManager, terrainBarRunnable),
                 this
         );
         getServer().getPluginManager().registerEvents(new BossBarHandler(bossBarManager), this);

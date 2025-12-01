@@ -5,24 +5,29 @@ import net.dzikoysk.funnyguilds.guild.Guild;
 import net.dzikoysk.funnyguilds.shared.bukkit.LocationUtils;
 import net.dzikoysk.funnyguilds.user.User;
 import net.dzikoysk.funnyguilds.shared.bukkit.ChatUtils;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BossBar;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.entity.Player;
 import pl.tenfajnybartek.funnyaddons.bossbar.BossBarManager;
+import pl.tenfajnybartek.funnyaddons.config.BossBarConfig;
 import pl.tenfajnybartek.funnyaddons.managers.ConfigManager;
 import pl.tenfajnybartek.funnyaddons.managers.PlayerPositionManager;
 
 public class GuildTerrainBarRunnable implements Runnable {
 
-    private final ConfigManager config;
-    private final FunnyGuilds funnyGuilds;
+    private final ConfigManager configManager;
+    private final BossBarConfig bossBarConfig;
     private final PlayerPositionManager playerPositionManager;
     private final BossBarManager bossBarManager;
+    private final FunnyGuilds funnyGuilds;
 
-    public GuildTerrainBarRunnable(ConfigManager config, PlayerPositionManager playerPositionManager, BossBarManager bossBarManager) {
-        this.config = config;
+    public GuildTerrainBarRunnable(ConfigManager configManager,
+                                   PlayerPositionManager playerPositionManager,
+                                   BossBarManager bossBarManager) {
+        this.configManager = configManager;
+        this.bossBarConfig = configManager.getBossBarConfig();
         this.playerPositionManager = playerPositionManager;
         this.bossBarManager = bossBarManager;
         this.funnyGuilds = FunnyGuilds.getInstance();
@@ -30,119 +35,92 @@ public class GuildTerrainBarRunnable implements Runnable {
 
     @Override
     public void run() {
-        String modeStr = config.getBossBarMode();
+        String modeStr = configManager.getBossBarMode();
         GuildTerrainBarMode mode = GuildTerrainBarMode.valueOf(modeStr);
-        boolean progressBased = config.isBossBarProgressBasedOnDistance();
+        boolean progressBased = configManager.isBossBarProgressBasedOnDistance();
 
         Bukkit.getOnlinePlayers().forEach(player -> {
-            Guild guild = this.playerPositionManager.find(player.getUniqueId());
-            if (guild == null) {
-                return;
-            }
-
+            Guild terrainGuild = this.playerPositionManager.find(player.getUniqueId());
             User user = this.funnyGuilds.getUserManager().findByPlayer(player).orNull();
-            if (user == null) {
-                return;
-            }
 
-            GuildRelation relation = GuildRelation.match(user.getGuild().orNull(), guild);
-            double distance = LocationUtils.flatDistance(player.getLocation(), guild.getCenter().get());
-
-            switch (mode) {
-                case BOSS_BAR: {
-                    BossBar bossBar = this.bossBarManager.find(player);
-                    ConfigManager.BossBarMessage bbMsg = this.config.getBossBarMessage(relation.name());
-
-                    if (bbMsg == null) return;
-                    String message = bbMsg.message
-                            .replace("{GUILD-TAG}", guild.getTag())
-                            .replace("{GUILD-NAME}", guild.getName())
-                            .replace("{DISTANCE}", String.format("%.2f", distance))
-                            .replace("{PROTECTION}", TimeUtils.parseTime(guild.getProtection().toEpochMilli()));
-
-                    bossBar.setTitle(ChatUtils.colored(message));
-                    bossBar.setColor(parseBarColor(bbMsg.color));
-                    bossBar.setStyle(parseBarStyle(bbMsg.style));
-                    if (progressBased && guild.getRegion().isPresent()) {
-                        double size = guild.getRegion().get().getSize();
-                        bossBar.setProgress(Math.max(1 - (distance / size), 0));
-                    }
-                    break;
-                }
-                case ACTION_BAR: {
-                    String abMessage = config.getActionBarMessage(relation.name());
-                    if (abMessage == null) return;
-                    abMessage = abMessage
-                            .replace("{GUILD-TAG}", guild.getTag())
-                            .replace("{GUILD-NAME}", guild.getName())
-                            .replace("{DISTANCE}", String.format("%.2f", distance))
-                            .replace("{PROTECTION}", TimeUtils.parseTime(guild.getProtection().toEpochMilli()));
-
-                    player.sendActionBar(Component.text(ChatUtils.colored(abMessage)));
-                    break;
-                }
-            }
+            displayForPlayer(player, terrainGuild, user, mode, progressBased);
         });
     }
 
-    public static void displayForPlayer(
-            org.bukkit.entity.Player player,
-            Guild guild,
-            User user,
-            ConfigManager config,
-            BossBarManager bossBarManager
-    ) {
-        String modeStr = config.getBossBarMode();
-        GuildTerrainBarMode mode = GuildTerrainBarMode.valueOf(modeStr);
-        boolean progressBased = config.isBossBarProgressBasedOnDistance();
+    public void displayForPlayer(Player player,
+                                 Guild terrainGuild,
+                                 User user,
+                                 GuildTerrainBarMode mode,
+                                 boolean progressBased) {
+        if (terrainGuild == null) {
+            clearBossBar(player);
+            return;
+        }
 
-        GuildRelation relation = GuildRelation.match(user.getGuild().orNull(), guild);
-        double distance = net.dzikoysk.funnyguilds.shared.bukkit.LocationUtils.flatDistance(player.getLocation(), guild.getCenter().get());
+        if (user == null) {
+            clearBossBar(player);
+            return;
+        }
+
+        Guild playerGuild = user.getGuild().orNull();
+        GuildRelation relation = GuildRelation.match(playerGuild, terrainGuild);
+
+        double distance = LocationUtils.flatDistance(player.getLocation(), terrainGuild.getCenter().get());
 
         switch (mode) {
             case BOSS_BAR: {
-                BossBar bossBar = bossBarManager.find(player);
-                ConfigManager.BossBarMessage bbMsg = config.getBossBarMessage(relation.name());
+                BossBar bossBar = this.bossBarManager.find(player);
 
-                if (bbMsg == null) return;
-                String message = bbMsg.message
-                        .replace("{GUILD-TAG}", guild.getTag())
-                        .replace("{GUILD-NAME}", guild.getName())
-                        .replace("{DISTANCE}", String.format("%.2f", distance))
-                        .replace("{PROTECTION}", TimeUtils.parseTime(guild.getProtection().toEpochMilli()));
-
-                bossBar.setTitle(net.dzikoysk.funnyguilds.shared.bukkit.ChatUtils.colored(message));
-                bossBar.setColor(modeColor(bbMsg.color));
-                bossBar.setStyle(modeStyle(bbMsg.style));
-                if (progressBased && guild.getRegion().isPresent()) {
-                    double size = guild.getRegion().get().getSize();
-                    bossBar.setProgress(Math.max(1 - (distance / size), 0));
+                BossBarConfig.BossBarMessage bbMsg = this.bossBarConfig.getBossBarMessage(relation.name());
+                if (bbMsg == null) {
+                    bossBar.setVisible(false);
+                    return;
                 }
+
+                String message = bbMsg.getMessage()
+                        .replace("{GUILD-TAG}", terrainGuild.getTag())
+                        .replace("{GUILD-NAME}", terrainGuild.getName())
+                        .replace("{DISTANCE}", String.format("%.2f", distance))
+                        .replace("{PROTECTION}", TimeUtils.parseTime(terrainGuild.getProtection().toEpochMilli()));
+
+                bossBar.setTitle(ChatUtils.colored(message));
+                bossBar.setColor(parseBarColor(bbMsg.getColor()));
+                bossBar.setStyle(parseBarStyle(bbMsg.getStyle()));
+
+                if (progressBased && terrainGuild.getRegion().isPresent()) {
+                    double size = terrainGuild.getRegion().get().getSize();
+                    bossBar.setProgress(Math.max(1 - (distance / size), 0));
+                } else {
+                    bossBar.setProgress(1.0);
+                }
+
+                bossBar.setVisible(true);
                 break;
             }
-            case ACTION_BAR: {
-                String abMessage = config.getActionBarMessage(relation.name());
-                if (abMessage == null) return;
-                abMessage = abMessage
-                        .replace("{GUILD-TAG}", guild.getTag())
-                        .replace("{GUILD-NAME}", guild.getName())
-                        .replace("{DISTANCE}", String.format("%.2f", distance))
-                        .replace("{PROTECTION}", TimeUtils.parseTime(guild.getProtection().toEpochMilli()));
 
-                player.sendActionBar(Component.text(net.dzikoysk.funnyguilds.shared.bukkit.ChatUtils.colored(abMessage)));
+            case ACTION_BAR: {
+                String abMessage = configManager.getActionBarMessage(relation.name());
+                if (abMessage == null || abMessage.isEmpty()) {
+                    return;
+                }
+
+                String message = abMessage
+                        .replace("{GUILD-TAG}", terrainGuild.getTag())
+                        .replace("{GUILD-NAME}", terrainGuild.getName())
+                        .replace("{DISTANCE}", String.format("%.2f", distance));
+
+                player.sendActionBar(ChatUtils.colored(message));
                 break;
             }
         }
     }
 
-    private static BarColor modeColor(String color) {
-        try { return BarColor.valueOf(color.toUpperCase()); }
-        catch (Exception e) { return BarColor.WHITE; }
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 
-    private static BarStyle modeStyle(String style) {
-        try { return BarStyle.valueOf(style.toUpperCase()); }
-        catch (Exception e) { return BarStyle.SOLID; }
+    private void clearBossBar(Player player) {
+        this.bossBarManager.remove(player);
     }
 
     private BarColor parseBarColor(String color) {

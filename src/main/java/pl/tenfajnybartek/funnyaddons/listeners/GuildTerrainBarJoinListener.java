@@ -8,21 +8,19 @@ import net.dzikoysk.funnyguilds.user.User;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import pl.tenfajnybartek.funnyaddons.bossbar.BossBarManager;
-import pl.tenfajnybartek.funnyaddons.managers.ConfigManager;
 import pl.tenfajnybartek.funnyaddons.managers.PlayerPositionManager;
+import pl.tenfajnybartek.funnyaddons.utils.GuildTerrainBarMode;
 import pl.tenfajnybartek.funnyaddons.utils.GuildTerrainBarRunnable;
 
 public class GuildTerrainBarJoinListener implements Listener {
 
-    private final ConfigManager config;
     private final PlayerPositionManager positionManager;
-    private final BossBarManager bossBarManager;
+    private final GuildTerrainBarRunnable terrainBarRunnable;
 
-    public GuildTerrainBarJoinListener(ConfigManager config, PlayerPositionManager positionManager, BossBarManager bossBarManager) {
-        this.config = config;
+    public GuildTerrainBarJoinListener(PlayerPositionManager positionManager,
+                                       GuildTerrainBarRunnable terrainBarRunnable) {
         this.positionManager = positionManager;
-        this.bossBarManager = bossBarManager;
+        this.terrainBarRunnable = terrainBarRunnable;
     }
 
     @EventHandler
@@ -39,11 +37,29 @@ public class GuildTerrainBarJoinListener implements Listener {
             }
         }
 
-        if (guild == null) return;
+        if (guild == null) {
+            return;
+        }
 
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(event.getPlayer()).orNull();
-        if (user == null) return;
+        if (user == null) {
+            return;
+        }
 
-        GuildTerrainBarRunnable.displayForPlayer(event.getPlayer(), guild, user, config, bossBarManager);
+        String modeStr = terrainBarRunnable
+                .getConfigManager()
+                .getBossBarMode();
+        GuildTerrainBarMode mode = GuildTerrainBarMode.valueOf(modeStr);
+        boolean progressBased = terrainBarRunnable
+                .getConfigManager()
+                .isBossBarProgressBasedOnDistance();
+
+        terrainBarRunnable.displayForPlayer(
+                event.getPlayer(),
+                guild,
+                user,
+                mode,
+                progressBased
+        );
     }
 }
