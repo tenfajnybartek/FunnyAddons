@@ -29,8 +29,8 @@ Addon do pluginu FunnyGuilds — dodaje per‑członek uprawnienia na terenie gi
 - Komenda do wyświetlania wolnych miejsc na gildie (generacja koordynatów).
 
 ## Komendy
-- /uprawnienia — otwiera panel uprawnień gildii (dostępne dla graczy z odpowiednimi prawami FG)
-- /kupkordy (alias buycoords) — kupowanie kordów gildii (konfigurowalne w `config.yml`)
+- /uprawnienia <nick> — otwiera panel uprawnień gildii (dostępne dla graczy z odpowiednimi prawami FG)
+- /kupkordy <tag> (alias buycoords) — kupowanie kordów gildii (konfigurowalne w `config.yml`)
 - /wolnemiejsce (alias freespace) — lista wolnych miejsc do założenia gildii
 - /fgaddonsreload (alias fgareload) — przeładuj config addonu
 
