@@ -3,7 +3,7 @@
 # FunnyAddons
 Addon do pluginu FunnyGuilds — dodaje per‑członek uprawnienia na terenie gildii oraz wygodne GUI do ich zarządzania.
 
-- Kompatybilność serwera: Paper/Spigot 1.21.4 (testowane na Paper 1.21.4)
+- Kompatybilność serwera: Paper(testowane na Paper 1.21.4)
 - Wymagany FunnyGuilds: **4.13.1-SNAPSHOT.1759** (kompatybilne z MC 1.8–1.21)
 - JDK: Java 21 (zgodna z serwerami 1.21.x)
 
