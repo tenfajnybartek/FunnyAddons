@@ -1,4 +1,4 @@
-#DO NOT USE THIS, ITS ONLY FOR TESTING ON LOCALHOST SERVER!
+# DO NOT USE THIS, ITS ONLY FOR TESTING ON LOCALHOST SERVER!
 
 # FunnyAddons
 Addon do pluginu FunnyGuilds — dodaje per‑członek uprawnienia na terenie gildii oraz wygodne GUI do ich zarządzania.
