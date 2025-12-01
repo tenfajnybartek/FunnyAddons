@@ -2,6 +2,9 @@ package pl.tenfajnybartek.funnyaddons.utils;
 
 import org.bukkit.Material;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Enum representing all available permission types for guild members.
  * <p>
@@ -184,35 +187,40 @@ public enum PermissionType {
         return defaultDenialMessage;
     }
 
+    // Static lookup maps for O(1) access (initialized lazily with static blocks)
+    private static final Map<String, PermissionType> CONFIG_KEY_MAP = new HashMap<>();
+    private static final Map<String, PermissionType> MESSAGE_KEY_MAP = new HashMap<>();
+
+    static {
+        for (PermissionType type : values()) {
+            CONFIG_KEY_MAP.put(type.configKey.toLowerCase(), type);
+            MESSAGE_KEY_MAP.put(type.messageKey.toLowerCase(), type);
+        }
+    }
+
     /**
      * Finds a PermissionType by its config key.
+     * <p>
+     * Uses an optimized O(1) lookup via static map.
      *
      * @param configKey The config key to search for (case-insensitive)
      * @return The matching PermissionType, or null if not found
      */
     public static PermissionType fromConfigKey(String configKey) {
         if (configKey == null) return null;
-        for (PermissionType type : values()) {
-            if (type.configKey.equalsIgnoreCase(configKey)) {
-                return type;
-            }
-        }
-        return null;
+        return CONFIG_KEY_MAP.get(configKey.toLowerCase());
     }
 
     /**
      * Finds a PermissionType by its message key.
+     * <p>
+     * Uses an optimized O(1) lookup via static map.
      *
      * @param messageKey The message key to search for (case-insensitive)
      * @return The matching PermissionType, or null if not found
      */
     public static PermissionType fromMessageKey(String messageKey) {
         if (messageKey == null) return null;
-        for (PermissionType type : values()) {
-            if (type.messageKey.equalsIgnoreCase(messageKey)) {
-                return type;
-            }
-        }
-        return null;
+        return MESSAGE_KEY_MAP.get(messageKey.toLowerCase());
     }
 }
