@@ -37,64 +37,75 @@ public enum PermissionType {
     /**
      * Permission to break blocks in guild territory.
      */
-    BREAK("no-break", "&aNiszczenie bloków", "break", Material.DIAMOND_PICKAXE, 10),
+    BREAK("no-break", "&aNiszczenie bloków", "break", Material.DIAMOND_PICKAXE, 10,
+            "&cNie masz uprawnień do niszczenia na terenie tej gildii!"),
 
     /**
      * Permission to place blocks in guild territory.
      */
-    PLACE("no-place", "&aStawianie bloków", "place", Material.OAK_PLANKS, 11),
+    PLACE("no-place", "&aStawianie bloków", "place", Material.OAK_PLANKS, 11,
+            "&cNie masz uprawnień do stawiania bloków na terenie tej gildii!"),
 
     /**
      * Permission to open chests and other container blocks.
      */
-    OPEN_CHEST("no-open-chest", "&aOtwieranie skrzyń", "open_chest", Material.CHEST, 14),
+    OPEN_CHEST("no-open-chest", "&aOtwieranie skrzyń", "open_chest", Material.CHEST, 14,
+            "&cNie masz uprawnień do otwierania skrzyń na terenie tej gildii!"),
 
     /**
      * Permission to open ender chests in guild territory.
      */
-    OPEN_ENDER_CHEST("no-open-ender", "&aOtwieranie ender chestów", "open_ender_chest", Material.ENDER_CHEST, 15),
+    OPEN_ENDER_CHEST("no-open-ender", "&aOtwieranie ender chestów", "open_ender_chest", Material.ENDER_CHEST, 15,
+            "&cNie masz uprawnień do otwierania ender chesta na terenie tej gildii!"),
 
     /**
      * Permission to enable friendly fire (damage guild members).
      */
-    FRIENDLY_FIRE("no-friendly-fire", "&aFriendly fire", "friendly_fire", Material.TIPPED_ARROW, 21),
+    FRIENDLY_FIRE("no-friendly-fire", "&aFriendly fire", "friendly_fire", Material.TIPPED_ARROW, 21,
+            "&cNie możesz obrażać członków swojej gildii!"),
 
     /**
      * Permission to interact with buttons, levers, doors, etc.
      */
-    INTERACT_BLOCK("no-interact", "&aInterakcja z blokami", "interact_block", Material.LEVER, 12),
+    INTERACT_BLOCK("no-interact", "&aInterakcja z blokami", "interact_block", Material.LEVER, 12,
+            "&cNie masz uprawnień do używania przycisków/dźwigni/drzwi na terenie tej gildii!"),
 
     /**
      * Permission to use buckets (water, lava, etc.).
      */
-    USE_BUCKETS("no-buckets", "&aUżywanie kubełków", "use_buckets", Material.WATER_BUCKET, 16),
+    USE_BUCKETS("no-buckets", "&aUżywanie kubełków", "use_buckets", Material.WATER_BUCKET, 16,
+            "&cNie masz uprawnień do używania kubełków na terenie tej gildii!"),
 
     /**
      * Permission to use flint and steel (fire).
      */
-    USE_FIRE("no-fire", "&aUżywanie flint & steel", "use_fire", Material.FLINT_AND_STEEL, 19);
+    USE_FIRE("no-fire", "&aUżywanie flint & steel", "use_fire", Material.FLINT_AND_STEEL, 19,
+            "&cNie masz uprawnień do używania flinta i stali (odpalenie) na terenie tej gildii!");
 
     private final String messageKey;
     private final String defaultDisplayName;
     private final String configKey;
     private final Material defaultIcon;
     private final int defaultSlot;
+    private final String defaultDenialMessage;
 
     /**
      * Creates a new PermissionType with full metadata.
      *
-     * @param messageKey         The message key suffix for permission denial messages (e.g., "no-break")
-     * @param defaultDisplayName The default display name for GUI representation
-     * @param configKey          The config key for looking up icon/slot/name in config
-     * @param defaultIcon        The default Material icon for this permission
-     * @param defaultSlot        The default slot position in the permissions GUI
+     * @param messageKey            The message key suffix for permission denial messages (e.g., "no-break")
+     * @param defaultDisplayName    The default display name for GUI representation
+     * @param configKey             The config key for looking up icon/slot/name in config
+     * @param defaultIcon           The default Material icon for this permission
+     * @param defaultSlot           The default slot position in the permissions GUI
+     * @param defaultDenialMessage  The default denial message when permission is not granted
      */
-    PermissionType(String messageKey, String defaultDisplayName, String configKey, Material defaultIcon, int defaultSlot) {
+    PermissionType(String messageKey, String defaultDisplayName, String configKey, Material defaultIcon, int defaultSlot, String defaultDenialMessage) {
         this.messageKey = messageKey;
         this.defaultDisplayName = defaultDisplayName;
         this.configKey = configKey;
         this.defaultIcon = defaultIcon;
         this.defaultSlot = defaultSlot;
+        this.defaultDenialMessage = defaultDenialMessage;
     }
 
     /**
@@ -162,6 +173,18 @@ public enum PermissionType {
     }
 
     /**
+     * Gets the default denial message for this permission.
+     * <p>
+     * This is the fallback message shown when a player lacks this permission
+     * and no config override exists.
+     *
+     * @return The default denial message with color codes
+     */
+    public String getDefaultDenialMessage() {
+        return defaultDenialMessage;
+    }
+
+    /**
      * Finds a PermissionType by its config key.
      *
      * @param configKey The config key to search for (case-insensitive)
@@ -169,9 +192,8 @@ public enum PermissionType {
      */
     public static PermissionType fromConfigKey(String configKey) {
         if (configKey == null) return null;
-        String normalized = configKey.toLowerCase();
         for (PermissionType type : values()) {
-            if (type.configKey.equals(normalized)) {
+            if (type.configKey.equalsIgnoreCase(configKey)) {
                 return type;
             }
         }
@@ -186,9 +208,8 @@ public enum PermissionType {
      */
     public static PermissionType fromMessageKey(String messageKey) {
         if (messageKey == null) return null;
-        String normalized = messageKey.toLowerCase();
         for (PermissionType type : values()) {
-            if (type.messageKey.equals(normalized)) {
+            if (type.messageKey.equalsIgnoreCase(messageKey)) {
                 return type;
             }
         }

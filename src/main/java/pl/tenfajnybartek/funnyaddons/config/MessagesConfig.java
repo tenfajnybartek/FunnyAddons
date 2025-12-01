@@ -117,13 +117,13 @@ public class MessagesConfig {
      * Retrieves the permission denial message for a specific PermissionType.
      * <p>
      * Uses the permission type's message key to look up the message in config.
-     * Falls back to a generic default message if not configured.
+     * Falls back to the enum's default denial message if not configured.
      *
      * @param type The permission type to get the denial message for
      * @return The configured denial message for the permission type
      */
     public String getPermsMessageFor(PermissionType type) {
-        return getPermsMessage(type.getMessageKey(), getDefaultDenialMessage(type));
+        return getPermsMessage(type.getMessageKey(), type.getDefaultDenialMessage());
     }
 
     /**
@@ -136,27 +136,6 @@ public class MessagesConfig {
      */
     public Component getPermsComponentFor(PermissionType type) {
         return toComponent(getPermsMessageFor(type));
-    }
-
-    /**
-     * Gets a default denial message for a permission type.
-     * <p>
-     * This provides a fallback message based on the permission type's display name.
-     *
-     * @param type The permission type
-     * @return A default denial message
-     */
-    private String getDefaultDenialMessage(PermissionType type) {
-        return switch (type) {
-            case BREAK -> "&cNie masz uprawnień do niszczenia na terenie tej gildii!";
-            case PLACE -> "&cNie masz uprawnień do stawiania bloków na terenie tej gildii!";
-            case OPEN_CHEST -> "&cNie masz uprawnień do otwierania skrzyń na terenie tej gildii!";
-            case OPEN_ENDER_CHEST -> "&cNie masz uprawnień do otwierania ender chesta na terenie tej gildii!";
-            case INTERACT_BLOCK -> "&cNie masz uprawnień do używania przycisków/dźwigni/drzwi na terenie tej gildii!";
-            case USE_BUCKETS -> "&cNie masz uprawnień do używania kubełków na terenie tej gildii!";
-            case USE_FIRE -> "&cNie masz uprawnień do używania flinta i stali (odpalenie) na terenie tej gildii!";
-            case FRIENDLY_FIRE -> "&cNie możesz obrażać członków swojej gildii!";
-        };
     }
 
     // Permission denial messages
