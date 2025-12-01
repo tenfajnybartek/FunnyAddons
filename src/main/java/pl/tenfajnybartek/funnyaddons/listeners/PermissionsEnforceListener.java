@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
 import pl.tenfajnybartek.funnyaddons.utils.ChatUtils;
 import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
@@ -39,7 +40,6 @@ public class PermissionsEnforceListener implements Listener {
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(p).orNull();
         if (user == null) { event.setCancelled(true); return; }
 
-        // allow owner always - TODO: dopasuj do API ownera
         if (isOwner(user, guild)) return;
 
         boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.BREAK);
@@ -70,6 +70,13 @@ public class PermissionsEnforceListener implements Listener {
     @EventHandler
     public void onOpenInventory(InventoryOpenEvent event) {
         if (!(event.getPlayer() instanceof Player p)) return;
+
+        // Jeżeli to nie jest "kontener" (skrzynia/hopper/barrel/ender...), ignorujemy event (np. GUI pluginu/kreative)
+        InventoryType type = event.getInventory().getType();
+        if (!isContainerType(type)) {
+            return;
+        }
+
         Guild guild = getGuildAtLocation(p.getLocation());
         if (guild == null) return;
 
@@ -93,7 +100,6 @@ public class PermissionsEnforceListener implements Listener {
         Guild guild = getGuildAtLocation(damper.getLocation());
         if (guild == null) return;
 
-        // jeżeli na terenie gildii obowiązują uprawnienia PVP
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(damper).orNull();
         if (user == null) { event.setCancelled(true); return; }
 
@@ -107,7 +113,7 @@ public class PermissionsEnforceListener implements Listener {
     }
 
     private boolean isOwner(User user, Guild guild) {
-        // TODO: dopasuj to do API FunnyGuilds: sprawdź czy user jest ownerem gildii
+        // TODO: dopasuj do API FunnyGuilds: sprawdź czy user jest ownerem gildii
         try {
             Object owner = guild.getOwner();
             if (owner != null && owner.toString().equalsIgnoreCase(user.getName())) {
@@ -115,5 +121,24 @@ public class PermissionsEnforceListener implements Listener {
             }
         } catch (NoSuchMethodError | NoClassDefFoundError ignored) {}
         return false;
+    }
+
+    private boolean isContainerType(InventoryType type) {
+        switch (type) {
+            case CHEST:
+            case ENDER_CHEST:
+            case HOPPER:
+            case DROPPER:
+            case DISPENSER:
+            case FURNACE:
+            case BARREL:
+            case BLAST_FURNACE:
+            case SMOKER:
+            case SHULKER_BOX:
+            case WORKBENCH:
+                return true;
+            default:
+                return false;
+        }
     }
 }

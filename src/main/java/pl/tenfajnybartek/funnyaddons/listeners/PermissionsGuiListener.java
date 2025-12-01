@@ -1,10 +1,13 @@
 package pl.tenfajnybartek.funnyaddons.listeners;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
 import pl.tenfajnybartek.funnyaddons.permissions.MemberPermissionsGUI;
 import pl.tenfajnybartek.funnyaddons.utils.GUIContext;
@@ -25,8 +28,21 @@ public class PermissionsGuiListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player viewer)) return;
 
-        String title = event.getView().getTitle();
-        event.setCancelled(true); // zapobiegamy przenoszeniu itemów w GUI
+        UUID viewerId = viewer.getUniqueId();
+        boolean isMembersInv = GUIContext.getGuildTagForMembersInv(viewerId) != null;
+        boolean isMemberPermInv = GUIContext.getMemberContext(viewerId) != null;
+
+        // Jeżeli gracz nie ma zarejestrowanego kontekstu GUI -> to nie jest nasze GUI, ignorujemy event
+        if (!isMembersInv && !isMemberPermInv) {
+            return;
+        }
+
+        // Teraz pracujemy na naszym GUI -> blokujemy przenoszenie itemów
+        event.setCancelled(true);
+
+        // Pobieramy tytuł jako Component -> konwertujemy do plain text
+        Component titleComp = event.getView().title();
+        String title = PlainTextComponentSerializer.plainText().serialize(titleComp);
 
         // Members list GUI
         if (title.startsWith("Gildia: ")) {
@@ -37,44 +53,46 @@ public class PermissionsGuiListener implements Listener {
             UUID memberUuid = null;
             try {
                 var meta = clicked.getItemMeta();
-                String name = meta.getDisplayName();
-                // jeżeli jest to skull - spróbuj pobrać offline playera po wyświetlanej nazwie
                 var owner = meta instanceof org.bukkit.inventory.meta.SkullMeta ? ((org.bukkit.inventory.meta.SkullMeta) meta).getOwningPlayer() : null;
                 if (owner != null) memberUuid = owner.getUniqueId();
             } catch (Exception ignored) {}
 
             if (memberUuid == null) return;
 
-            String guildTag = GUIContext.getGuildTagForMembersInv(viewer.getUniqueId());
+            String guildTag = GUIContext.getGuildTagForMembersInv(viewerId);
             if (guildTag == null) return;
 
             // otwórz member permissions GUI
             MemberPermissionsGUI.open(viewer, memberUuid, guildTag, perms);
-            GUIContext.unregisterMembersInventory(viewer.getUniqueId());
+            GUIContext.unregisterMembersInventory(viewerId);
             return;
         }
 
         // Member permissions GUI
         if (title.startsWith("Uprawnienia: ")) {
-            var ctx = GUIContext.getMemberContext(viewer.getUniqueId());
+            var ctx = GUIContext.getMemberContext(viewerId);
             if (ctx == null) return;
 
             ItemStack clicked = event.getCurrentItem();
             if (clicked == null || !clicked.hasItemMeta()) return;
 
-            String display = clicked.getItemMeta().getDisplayName();
+            // Używamy ItemMeta.displayName() (Component) zamiast przestarzałego getDisplayName()
+            ItemMeta itemMeta = clicked.getItemMeta();
+            Component displayComp = itemMeta != null ? itemMeta.displayName() : null;
+            String display = displayComp != null
+                    ? PlainTextComponentSerializer.plainText().serialize(displayComp)
+                    : null;
+
             if (display == null) return;
 
             // back
             if (display.equalsIgnoreCase("Powrót")) {
-                // wróć do listy członków
-                // TODO: znajdź guild obiekt, otwórz ponownie listę
                 ViewerUtils.openMembersGuiByGuildTag(viewer, ctx.guildTag, perms);
-                GUIContext.unregisterMemberPermissionsInventory(viewer.getUniqueId());
+                GUIContext.unregisterMemberPermissionsInventory(viewerId);
                 return;
             }
 
-            // toggles - nazwa zawiera [ON]/[OFF] i typ
+            // toggles - nazwa zawiera typ
             if (display.contains("BREAK")) {
                 perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.BREAK);
             } else if (display.contains("PLACE")) {
