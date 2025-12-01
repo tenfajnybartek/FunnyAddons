@@ -108,41 +108,13 @@ public class PermissionsGuiListener implements Listener {
             }
         }
 
-        // Use slot-based detection for permission toggles (config-driven)
-        PermissionType toggledType = getPermissionTypeBySlot(slot, permCfg);
+        // Use dynamic slot-based detection for permission toggles via PermissionType enum
+        PermissionType toggledType = permCfg.getPermissionTypeBySlot(slot);
 
         if (toggledType != null) {
             perms.togglePermission(ctx.guildTag, ctx.member, toggledType);
             MemberPermissionsGUI.open(viewer, ctx.member, ctx.guildTag, perms, plugin);
         }
-    }
-
-    /**
-     * Gets the PermissionType for a given slot based on config.
-     *
-     * @param slot    The clicked slot
-     * @param permCfg The permissions config
-     * @return The PermissionType for the slot, or null if not a permission toggle slot
-     */
-    private PermissionType getPermissionTypeBySlot(int slot, PermissionsConfig permCfg) {
-        if (slot == permCfg.getBreakSlot()) {
-            return PermissionType.BREAK;
-        } else if (slot == permCfg.getPlaceSlot()) {
-            return PermissionType.PLACE;
-        } else if (slot == permCfg.getInteractBlockSlot()) {
-            return PermissionType.INTERACT_BLOCK;
-        } else if (slot == permCfg.getOpenChestSlot()) {
-            return PermissionType.OPEN_CHEST;
-        } else if (slot == permCfg.getOpenEnderChestSlot()) {
-            return PermissionType.OPEN_ENDER_CHEST;
-        } else if (slot == permCfg.getUseBucketsSlot()) {
-            return PermissionType.USE_BUCKETS;
-        } else if (slot == permCfg.getUseFireSlot()) {
-            return PermissionType.USE_FIRE;
-        } else if (slot == permCfg.getFriendlyFireSlot()) {
-            return PermissionType.FRIENDLY_FIRE;
-        }
-        return null;
     }
 
     @EventHandler

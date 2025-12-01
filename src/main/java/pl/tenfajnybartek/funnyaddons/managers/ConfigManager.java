@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import pl.tenfajnybartek.funnyaddons.config.BossBarConfig;
 import pl.tenfajnybartek.funnyaddons.config.MessagesConfig;
 import pl.tenfajnybartek.funnyaddons.config.PermissionsConfig;
+import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 
 import java.io.File;
 import java.util.HashMap;
@@ -243,6 +244,60 @@ public class ConfigManager {
     public Component getPermsNoBucketsComponent() { return messagesConfig.getPermsNoBucketsComponent(); }
     public Component getPermsNoFireComponent() { return messagesConfig.getPermsNoFireComponent(); }
     public Component getPermsNoFriendlyFireComponent() { return messagesConfig.getPermsNoFriendlyFireComponent(); }
+
+    // ---------- PermissionType-based Dynamic Lookups ----------
+
+    /**
+     * Gets the permission denial message for a specific PermissionType.
+     * <p>
+     * Uses the permission type's message key to look up the message in config.
+     *
+     * @param type The permission type to get the denial message for
+     * @return The configured denial message for the permission type
+     */
+    public String getPermsMessageFor(PermissionType type) {
+        return messagesConfig.getPermsMessageFor(type);
+    }
+
+    /**
+     * Gets the permission denial message as a Component for a specific PermissionType.
+     *
+     * @param type The permission type to get the denial message for
+     * @return The configured denial message as a Component
+     */
+    public Component getPermsComponentFor(PermissionType type) {
+        return messagesConfig.getPermsComponentFor(type);
+    }
+
+    /**
+     * Gets the slot for a permission type from config.
+     *
+     * @param type The permission type
+     * @return The configured slot number, or the default slot from the enum
+     */
+    public int getSlotFor(PermissionType type) {
+        return permissionsConfig.getSlotFor(type);
+    }
+
+    /**
+     * Gets the display name for a permission type from config.
+     *
+     * @param type The permission type
+     * @return The configured display name, or the default name from the enum
+     */
+    public String getDisplayNameFor(PermissionType type) {
+        return permissionsConfig.getDisplayNameFor(type);
+    }
+
+    /**
+     * Gets the icon Material for a permission type from config.
+     *
+     * @param type The permission type
+     * @return The configured Material icon, or the default icon from the enum
+     */
+    public Material getIconFor(PermissionType type) {
+        return permissionsConfig.getIconFor(type);
+    }
 
     // ---------- Component utilities (delegating to MessagesConfig) ----------
 

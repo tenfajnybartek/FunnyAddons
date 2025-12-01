@@ -2,6 +2,7 @@ package pl.tenfajnybartek.funnyaddons.config;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 
 import java.util.List;
 
@@ -10,6 +11,10 @@ import java.util.List;
  * <p>
  * Uses {@link PermissionsConfigKey} enum for typed configuration keys,
  * avoiding magic strings and providing compile-time safety.
+ * <p>
+ * Also provides methods to retrieve configuration values using {@link PermissionType}
+ * enum metadata for dynamic lookups, reducing code duplication and enabling
+ * config-driven GUI creation.
  */
 public class PermissionsConfig {
 
@@ -23,6 +28,71 @@ public class PermissionsConfig {
 
     public PermissionsConfig(FileConfiguration cfg) {
         this.cfg = cfg;
+    }
+
+    // ---------- PermissionType-based Dynamic Lookups ----------
+
+    /**
+     * Gets the slot for a permission type from config, with fallback to enum default.
+     * <p>
+     * Uses the permission type's config key to look up the slot in config.
+     * Falls back to the permission type's default slot if not configured.
+     *
+     * @param type The permission type
+     * @return The configured slot number, or the default slot from the enum
+     */
+    public int getSlotFor(PermissionType type) {
+        String path = "permissions.gui.slots." + type.getConfigKey();
+        return cfg.getInt(path, type.getDefaultSlot());
+    }
+
+    /**
+     * Gets the display name for a permission type from config, with fallback to enum default.
+     * <p>
+     * Uses the permission type's config key to look up the name in config.
+     * Falls back to the permission type's default display name if not configured.
+     *
+     * @param type The permission type
+     * @return The configured display name, or the default name from the enum
+     */
+    public String getDisplayNameFor(PermissionType type) {
+        String path = "permissions.gui.names." + type.getConfigKey();
+        return cfg.getString(path, type.getDefaultDisplayName());
+    }
+
+    /**
+     * Gets the icon Material for a permission type from config, with fallback to enum default.
+     * <p>
+     * Uses the permission type's config key to look up the icon in config.
+     * Falls back to the permission type's default icon if not configured.
+     *
+     * @param type The permission type
+     * @return The configured Material icon, or the default icon from the enum
+     */
+    public Material getIconFor(PermissionType type) {
+        String path = "permissions.icons." + type.getConfigKey();
+        String mat = cfg.getString(path, null);
+        if (mat == null || mat.isBlank()) return type.getDefaultIcon();
+        Material m = Material.matchMaterial(mat);
+        return m != null ? m : type.getDefaultIcon();
+    }
+
+    /**
+     * Finds a PermissionType by the given GUI slot.
+     * <p>
+     * Checks all permission types and returns the one that matches the given slot
+     * based on current configuration (with fallback to enum defaults).
+     *
+     * @param slot The slot to search for
+     * @return The matching PermissionType, or null if no permission is at that slot
+     */
+    public PermissionType getPermissionTypeBySlot(int slot) {
+        for (PermissionType type : PermissionType.values()) {
+            if (getSlotFor(type) == slot) {
+                return type;
+            }
+        }
+        return null;
     }
 
     // ---------- GUI Settings ----------

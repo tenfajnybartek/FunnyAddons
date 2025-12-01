@@ -67,38 +67,17 @@ public class MemberPermissionsGUI {
         String stateOff = permCfg.getStateOff();
         String toggleLore = permCfg.getToggleLore();
 
-        // Create toggle items using config-driven slots, icons, and names
-        inv.setItem(permCfg.getBreakSlot(), createToggleItem(
-                permCfg.getBreakIcon(), permCfg.getBreakName(),
-                has.contains(PermissionType.BREAK), stateOn, stateOff, toggleLore));
+        // Create toggle items for all permission types dynamically using enum metadata
+        for (PermissionType type : PermissionType.values()) {
+            int slot = permCfg.getSlotFor(type);
+            if (slot >= size) continue; // Skip if slot is out of bounds
 
-        inv.setItem(permCfg.getPlaceSlot(), createToggleItem(
-                permCfg.getPlaceIcon(), permCfg.getPlaceName(),
-                has.contains(PermissionType.PLACE), stateOn, stateOff, toggleLore));
+            Material icon = permCfg.getIconFor(type);
+            String name = permCfg.getDisplayNameFor(type);
+            boolean hasPermission = has.contains(type);
 
-        inv.setItem(permCfg.getInteractBlockSlot(), createToggleItem(
-                permCfg.getInteractBlockIcon(), permCfg.getInteractBlockName(),
-                has.contains(PermissionType.INTERACT_BLOCK), stateOn, stateOff, toggleLore));
-
-        inv.setItem(permCfg.getOpenChestSlot(), createToggleItem(
-                permCfg.getOpenChestIcon(), permCfg.getOpenChestName(),
-                has.contains(PermissionType.OPEN_CHEST), stateOn, stateOff, toggleLore));
-
-        inv.setItem(permCfg.getOpenEnderChestSlot(), createToggleItem(
-                permCfg.getOpenEnderChestIcon(), permCfg.getOpenEnderChestName(),
-                has.contains(PermissionType.OPEN_ENDER_CHEST), stateOn, stateOff, toggleLore));
-
-        inv.setItem(permCfg.getUseBucketsSlot(), createToggleItem(
-                permCfg.getUseBucketsIcon(), permCfg.getUseBucketsName(),
-                has.contains(PermissionType.USE_BUCKETS), stateOn, stateOff, toggleLore));
-
-        inv.setItem(permCfg.getUseFireSlot(), createToggleItem(
-                permCfg.getUseFireIcon(), permCfg.getUseFireName(),
-                has.contains(PermissionType.USE_FIRE), stateOn, stateOff, toggleLore));
-
-        inv.setItem(permCfg.getFriendlyFireSlot(), createToggleItem(
-                permCfg.getFriendlyFireIcon(), permCfg.getFriendlyFireName(),
-                has.contains(PermissionType.FRIENDLY_FIRE), stateOn, stateOff, toggleLore));
+            inv.setItem(slot, createToggleItem(icon, name, hasPermission, stateOn, stateOff, toggleLore));
+        }
 
         // Back button - adjust slot to size - 1 if configured slot is out of bounds
         int backSlot = permCfg.getBackSlot();

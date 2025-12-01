@@ -3,9 +3,13 @@ package pl.tenfajnybartek.funnyaddons.config;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.configuration.file.FileConfiguration;
+import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 
 /**
  * Configuration facade for all textual messages and Adventure Component wrappers.
+ * <p>
+ * Supports dynamic message retrieval using {@link PermissionType} enum metadata,
+ * enabling config-driven message handling without hardcoded keys.
  */
 public class MessagesConfig {
 
@@ -105,6 +109,54 @@ public class MessagesConfig {
      */
     public Component getPermsComponent(String key, String defaultValue) {
         return toComponent(getPermsMessage(key, defaultValue));
+    }
+
+    // ---------- PermissionType-based Dynamic Message Lookup ----------
+
+    /**
+     * Retrieves the permission denial message for a specific PermissionType.
+     * <p>
+     * Uses the permission type's message key to look up the message in config.
+     * Falls back to a generic default message if not configured.
+     *
+     * @param type The permission type to get the denial message for
+     * @return The configured denial message for the permission type
+     */
+    public String getPermsMessageFor(PermissionType type) {
+        return getPermsMessage(type.getMessageKey(), getDefaultDenialMessage(type));
+    }
+
+    /**
+     * Retrieves the permission denial message as a Component for a specific PermissionType.
+     * <p>
+     * Uses the permission type's message key to look up the message in config.
+     *
+     * @param type The permission type to get the denial message for
+     * @return The configured denial message as a Component
+     */
+    public Component getPermsComponentFor(PermissionType type) {
+        return toComponent(getPermsMessageFor(type));
+    }
+
+    /**
+     * Gets a default denial message for a permission type.
+     * <p>
+     * This provides a fallback message based on the permission type's display name.
+     *
+     * @param type The permission type
+     * @return A default denial message
+     */
+    private String getDefaultDenialMessage(PermissionType type) {
+        return switch (type) {
+            case BREAK -> "&cNie masz uprawnień do niszczenia na terenie tej gildii!";
+            case PLACE -> "&cNie masz uprawnień do stawiania bloków na terenie tej gildii!";
+            case OPEN_CHEST -> "&cNie masz uprawnień do otwierania skrzyń na terenie tej gildii!";
+            case OPEN_ENDER_CHEST -> "&cNie masz uprawnień do otwierania ender chesta na terenie tej gildii!";
+            case INTERACT_BLOCK -> "&cNie masz uprawnień do używania przycisków/dźwigni/drzwi na terenie tej gildii!";
+            case USE_BUCKETS -> "&cNie masz uprawnień do używania kubełków na terenie tej gildii!";
+            case USE_FIRE -> "&cNie masz uprawnień do używania flinta i stali (odpalenie) na terenie tej gildii!";
+            case FRIENDLY_FIRE -> "&cNie możesz obrażać członków swojej gildii!";
+        };
     }
 
     // Permission denial messages
