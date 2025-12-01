@@ -354,28 +354,45 @@ public class PanelConfig {
         private PotionEffectType parsePotionEffectType(String name) {
             if (name == null) return PotionEffectType.SPEED;
 
-            // Try direct registry lookup first
-            PotionEffectType type = org.bukkit.Registry.POTION_EFFECT_TYPE.get(
-                    org.bukkit.NamespacedKey.minecraft(name.toLowerCase())
-            );
-            if (type != null) return type;
+            String upperName = name.toUpperCase();
+
+            // Try direct registry lookup first (Paper 1.21+)
+            try {
+                PotionEffectType type = org.bukkit.Registry.POTION_EFFECT_TYPE.get(
+                        org.bukkit.NamespacedKey.minecraft(name.toLowerCase())
+                );
+                if (type != null) return type;
+            } catch (NoSuchFieldError | NoClassDefFoundError ignored) {
+                // Registry not available, fall through to legacy mapping
+            }
 
             // Map legacy names to new names
-            return switch (name.toUpperCase()) {
-                case "STRENGTH", "INCREASE_DAMAGE" -> PotionEffectType.STRENGTH;
-                case "SPEED" -> PotionEffectType.SPEED;
-                case "HASTE", "FAST_DIGGING" -> PotionEffectType.HASTE;
-                case "REGENERATION" -> PotionEffectType.REGENERATION;
-                case "RESISTANCE", "DAMAGE_RESISTANCE" -> PotionEffectType.RESISTANCE;
-                case "FIRE_RESISTANCE" -> PotionEffectType.FIRE_RESISTANCE;
-                case "WATER_BREATHING" -> PotionEffectType.WATER_BREATHING;
-                case "INVISIBILITY" -> PotionEffectType.INVISIBILITY;
-                case "NIGHT_VISION" -> PotionEffectType.NIGHT_VISION;
-                case "JUMP_BOOST", "JUMP" -> PotionEffectType.JUMP_BOOST;
-                case "SLOW_FALLING" -> PotionEffectType.SLOW_FALLING;
-                case "ABSORPTION" -> PotionEffectType.ABSORPTION;
-                default -> PotionEffectType.SPEED;
-            };
+            if (upperName.equals("STRENGTH") || upperName.equals("INCREASE_DAMAGE")) {
+                return PotionEffectType.STRENGTH;
+            } else if (upperName.equals("SPEED")) {
+                return PotionEffectType.SPEED;
+            } else if (upperName.equals("HASTE") || upperName.equals("FAST_DIGGING")) {
+                return PotionEffectType.HASTE;
+            } else if (upperName.equals("REGENERATION")) {
+                return PotionEffectType.REGENERATION;
+            } else if (upperName.equals("RESISTANCE") || upperName.equals("DAMAGE_RESISTANCE")) {
+                return PotionEffectType.RESISTANCE;
+            } else if (upperName.equals("FIRE_RESISTANCE")) {
+                return PotionEffectType.FIRE_RESISTANCE;
+            } else if (upperName.equals("WATER_BREATHING")) {
+                return PotionEffectType.WATER_BREATHING;
+            } else if (upperName.equals("INVISIBILITY")) {
+                return PotionEffectType.INVISIBILITY;
+            } else if (upperName.equals("NIGHT_VISION")) {
+                return PotionEffectType.NIGHT_VISION;
+            } else if (upperName.equals("JUMP_BOOST") || upperName.equals("JUMP")) {
+                return PotionEffectType.JUMP_BOOST;
+            } else if (upperName.equals("SLOW_FALLING")) {
+                return PotionEffectType.SLOW_FALLING;
+            } else if (upperName.equals("ABSORPTION")) {
+                return PotionEffectType.ABSORPTION;
+            }
+            return PotionEffectType.SPEED;
         }
 
         public String getKey() {

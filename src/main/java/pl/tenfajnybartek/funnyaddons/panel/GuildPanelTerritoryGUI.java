@@ -161,6 +161,9 @@ public class GuildPanelTerritoryGUI {
         removeItems(player, cost);
 
         // Update region size
+        // Note: Using reflection to access package-private methods in FunnyGuilds Region class.
+        // This is necessary because the FunnyGuilds API doesn't expose public setters for region size.
+        // If FunnyGuilds API changes, this may need to be updated.
         try {
             Region region = guild.getRegion().orNull();
             if (region != null) {
