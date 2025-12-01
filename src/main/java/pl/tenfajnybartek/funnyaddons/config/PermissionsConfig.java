@@ -10,6 +10,12 @@ import java.util.List;
  */
 public class PermissionsConfig {
 
+    /**
+     * The config section name for relation settings.
+     * Used in path: permissions.relation.RELATION.{relationType}.enforce
+     */
+    private static final String RELATION_SECTION = "RELATION";
+
     private final FileConfiguration cfg;
 
     public PermissionsConfig(FileConfiguration cfg) {
@@ -139,8 +145,11 @@ public class PermissionsConfig {
 
     /**
      * Checks if enforcement is enabled for a specific relation type.
+     *
+     * @param relationType The relation type (MEMBER, ALLY, ENEMY, OUTSIDER)
+     * @return true if enforcement is enabled for the given relation type
      */
     public boolean isRelationEnforced(String relationType) {
-        return cfg.getBoolean("permissions.relation.RELATION." + relationType + ".enforce", false);
+        return cfg.getBoolean("permissions.relation." + RELATION_SECTION + "." + relationType + ".enforce", false);
     }
 }

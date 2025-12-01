@@ -84,13 +84,24 @@ public class MessagesConfig {
 
     /**
      * Retrieves a permission-related message using the "perms-{key}" pattern.
+     *
+     * @param key the permission key suffix (e.g., "no-break" for "perms-no-break")
+     * @param defaultValue the default value if not found
+     * @return the message string
      */
     public String getPermsMessage(String key, String defaultValue) {
+        if (key == null || key.isEmpty()) {
+            return defaultValue;
+        }
         return getMessage("perms-" + key, defaultValue);
     }
 
     /**
      * Retrieves a permission-related message as Component.
+     *
+     * @param key the permission key suffix (e.g., "no-break" for "perms-no-break")
+     * @param defaultValue the default value if not found
+     * @return the message as Component
      */
     public Component getPermsComponent(String key, String defaultValue) {
         return toComponent(getPermsMessage(key, defaultValue));

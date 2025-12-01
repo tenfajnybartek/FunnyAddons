@@ -165,7 +165,18 @@ public class ConfigManager {
     }
 
     /**
-     * @deprecated Use BossBarConfig.BossBarMessage from getBossBarConfig() instead.
+     * @deprecated Since version 1.0.0-SNAPSHOT. Use {@link BossBarConfig.BossBarMessage} from
+     * {@link #getBossBarConfig()} instead.
+     * <p>Example migration:</p>
+     * <pre>
+     * // Old way:
+     * ConfigManager.BossBarMessage msg = configManager.getBossBarMessage("MEMBER");
+     * String text = msg.message;
+     *
+     * // New way:
+     * BossBarConfig.BossBarMessage msg = configManager.getBossBarConfig().getBossBarMessage("MEMBER");
+     * String text = msg.getMessage();
+     * </pre>
      */
     @Deprecated
     public static class BossBarMessage {
