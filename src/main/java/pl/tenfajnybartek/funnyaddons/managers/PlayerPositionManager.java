@@ -40,13 +40,14 @@ public class PlayerPositionManager {
         if (guild == null) {
             return removed;
         }
-        positions.entrySet().removeIf(entry -> {
+        java.util.Iterator<Map.Entry<UUID, Guild>> iterator = positions.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Guild> entry = iterator.next();
             if (guild.equals(entry.getValue())) {
                 removed.add(entry.getKey());
-                return true;
+                iterator.remove();
             }
-            return false;
-        });
+        }
         return removed;
     }
 }
