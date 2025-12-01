@@ -12,6 +12,7 @@ import pl.tenfajnybartek.funnyaddons.base.FunnyAddons;
 import pl.tenfajnybartek.funnyaddons.managers.ConfigManager;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
 import pl.tenfajnybartek.funnyaddons.utils.ChatUtils;
+import pl.tenfajnybartek.funnyaddons.utils.GUIContext;
 import pl.tenfajnybartek.funnyaddons.utils.GUIHolder;
 import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 
@@ -75,6 +76,8 @@ public class MemberPermissionsGUI {
         inv.setItem(size - 1, createBackItem(backMat));
 
         opener.openInventory(inv);
+
+        GUIContext.registerMemberPermissionsInventory(opener.getUniqueId(), guildTag, memberUuid, perms);
     }
 
     private static ItemStack createToggleItem(Material mat, String name, boolean on) {

@@ -44,6 +44,7 @@ public class PermissionsGuiListener implements Listener {
 
         Component titleComp = event.getView().title();
         String title = PlainTextComponentSerializer.plainText().serialize(titleComp);
+
         if (title.startsWith("Gildia: ")) {
             ItemStack clicked = event.getCurrentItem();
             if (clicked == null || !clicked.hasItemMeta()) return;
@@ -100,7 +101,7 @@ public class PermissionsGuiListener implements Listener {
             } else if (display.contains("FRIENDLY_FIRE")) {
                 perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.FRIENDLY_FIRE);
             }
-            
+
             MemberPermissionsGUI.open(viewer, ctx.member, ctx.guildTag, perms, plugin);
         }
     }

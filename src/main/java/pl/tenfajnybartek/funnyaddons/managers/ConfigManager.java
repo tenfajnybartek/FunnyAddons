@@ -56,6 +56,7 @@ public class ConfigManager {
         return plugin;
     }
 
+    // ---------- Convenience getters dla często używanych wiadomości ----------
     public String getInGuildMessage() {
         return getMessage("in-guild-message", "&cNie możesz użyć tej komendy, będąc w gildii!");
     }
@@ -78,6 +79,7 @@ public class ConfigManager {
         return v;
     }
 
+    // ---------- Pozostałe getters (Twoje dotychczasowe) ----------
     public int getMinBound() {
         return getConfig().getInt("bound.min");
     }
@@ -159,14 +161,21 @@ public class ConfigManager {
         }
     }
 
+    // -----------------------------
+    // Nowe getters związane z permissions/gui/icons/relation
+    // -----------------------------
+
+    // Rozmiar GUI dla MemberPermissionsGUI (domyślnie 27)
     public int getMemberPermissionsSize() {
         return getConfig().getInt("permissions.gui.member-permissions-size", 27);
     }
 
+    // Maksymalna długość tytułu inventory (klient) - domyślnie 32
     public int getTitleMaxLength() {
         return getConfig().getInt("permissions.gui.title-max-length", 32);
     }
 
+    // Pobierz Material z config.permissions.icons.{key} z fallbackiem
     public Material getIcon(String key, Material fallback) {
         String path = "permissions.icons." + key;
         String mat = getConfig().getString(path, null);
@@ -175,18 +184,22 @@ public class ConfigManager {
         return m != null ? m : fallback;
     }
 
+    // Domyślne uprawnienia dla roli (member/officer/owner) - lista Stringów
     public List<String> getDefaultPerms(String role) {
         return getConfig().getStringList("permissions.defaults." + role);
     }
 
+    // Czy relacje mają być włączone (relation.enable)
     public boolean isRelationEnabled() {
         return getConfig().getBoolean("permissions.relation.enable", false);
     }
 
+    // domyślne zachowanie relacji (follow_fg / follow_addon)
     public String getRelationDefaultBehavior() {
         return getConfig().getString("permissions.relation.default-behavior", "follow_fg");
     }
 
+    // shortcuty do komunikatów perms-no-* (String)
     public String getPermsNoBreakMessage() { return getMessage("perms-no-break", "&cNie masz uprawnień do niszczenia na terenie tej gildii!"); }
     public String getPermsNoPlaceMessage() { return getMessage("perms-no-place", "&cNie masz uprawnień do stawiania bloków na terenie tej gildii!"); }
     public String getPermsNoOpenChestMessage() { return getMessage("perms-no-open-chest", "&cNie masz uprawnień do otwierania skrzyń na terenie tej gildii!"); }
@@ -196,11 +209,23 @@ public class ConfigManager {
     public String getPermsNoFireMessage() { return getMessage("perms-no-fire", "&cNie masz uprawnień do używania flinta i stali (odpalenie) na terenie tej gildii!"); }
     public String getPermsNoFriendlyFireMessage() { return getMessage("perms-no-friendly-fire", "&cNie możesz obrażać członków swojej gildii!"); }
 
+    // convenience: zwracamy Component (gotowy do wysłania metodą player.sendMessage(Component))
+    public Component getPermsNoBreakComponent() { return toComponent(getPermsNoBreakMessage()); }
+    public Component getPermsNoPlaceComponent() { return toComponent(getPermsNoPlaceMessage()); }
+    public Component getPermsNoOpenChestComponent() { return toComponent(getPermsNoOpenChestMessage()); }
+    public Component getPermsNoOpenEnderComponent() { return toComponent(getPermsNoOpenEnderMessage()); }
+    public Component getPermsNoInteractComponent() { return toComponent(getPermsNoInteractMessage()); }
+    public Component getPermsNoBucketsComponent() { return toComponent(getPermsNoBucketsMessage()); }
+    public Component getPermsNoFireComponent() { return toComponent(getPermsNoFireMessage()); }
+    public Component getPermsNoFriendlyFireComponent() { return toComponent(getPermsNoFriendlyFireMessage()); }
+
+    // Parsowanie legacy-colored string -> Component
     public Component toComponent(String text) {
         if (text == null) return Component.empty();
         return LEGACY.deserialize(text);
     }
 
+    // Pobierz komunikat jako Component (z "messages." prefix)
     public Component messageAsComponent(String key) {
         String s = getMessage(key, "");
         return LEGACY.deserialize(s);
