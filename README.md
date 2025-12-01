@@ -1,4 +1,6 @@
-# FunnyAddons (DO NOT USE THIS, ITS ONLY FOR TESTING ON LOCALHOST SERVER!)
+#DO NOT USE THIS, ITS ONLY FOR TESTING ON LOCALHOST SERVER!
+
+# FunnyAddons
 Addon do pluginu FunnyGuilds — dodaje per‑członek uprawnienia na terenie gildii oraz wygodne GUI do ich zarządzania.
 
 - Kompatybilność serwera: Paper/Spigot 1.21.4 (testowane na Paper 1.21.4)
