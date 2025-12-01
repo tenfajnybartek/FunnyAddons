@@ -67,8 +67,11 @@ public class GuildPermissions {
 
     /**
      * Gets all permissions for this member.
+     * <p>
+     * Note: This returns the internal set. Use grant/revoke methods to modify
+     * permissions to ensure consistent behavior.
      *
-     * @return The set of permissions (modifiable)
+     * @return The set of permissions
      */
     public Set<PermissionType> getPermissions() {
         return permissions;
@@ -108,6 +111,10 @@ public class GuildPermissions {
      * @param type The permission type to toggle
      */
     public void toggle(PermissionType type) {
-        if (has(type)) revoke(type); else grant(type);
+        if (has(type)) {
+            revoke(type);
+        } else {
+            grant(type);
+        }
     }
 }

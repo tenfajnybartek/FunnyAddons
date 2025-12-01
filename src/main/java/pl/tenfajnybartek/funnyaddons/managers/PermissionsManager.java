@@ -85,7 +85,7 @@ public class PermissionsManager {
      *
      * @param guildTag The guild tag identifier
      * @param member   The UUID of the guild member
-     * @return An unmodifiable set of permissions granted to the member
+     * @return A set of permissions granted to the member (mutable EnumSet)
      */
     public Set<PermissionType> getPermissions(String guildTag, UUID member) {
         String cacheKey = buildCacheKey(guildTag, member);
@@ -220,7 +220,14 @@ public class PermissionsManager {
      */
     public void invalidateGuildCache(String guildTag) {
         String prefix = guildTag + ":";
-        cache.keySet().removeIf(key -> key.startsWith(prefix));
+        // Collect keys to remove to avoid ConcurrentModificationException
+        List<String> keysToRemove = new ArrayList<>();
+        for (String key : cache.keySet()) {
+            if (key.startsWith(prefix)) {
+                keysToRemove.add(key);
+            }
+        }
+        keysToRemove.forEach(cache::remove);
     }
 
     /**
