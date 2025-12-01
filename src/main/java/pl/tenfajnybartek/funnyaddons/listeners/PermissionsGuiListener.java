@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
@@ -32,21 +33,16 @@ public class PermissionsGuiListener implements Listener {
         boolean isMembersInv = GUIContext.getGuildTagForMembersInv(viewerId) != null;
         boolean isMemberPermInv = GUIContext.getMemberContext(viewerId) != null;
 
-        // Jeżeli gracz nie ma zarejestrowanego kontekstu GUI -> to nie jest nasze GUI, ignorujemy event
         if (!isMembersInv && !isMemberPermInv) {
             return;
         }
 
-        // Teraz pracujemy na naszym GUI -> blokujemy przenoszenie itemów
         event.setCancelled(true);
 
-        // Pobieramy tytuł jako Component -> konwertujemy do plain text
         Component titleComp = event.getView().title();
         String title = PlainTextComponentSerializer.plainText().serialize(titleComp);
 
-        // Members list GUI
         if (title.startsWith("Gildia: ")) {
-            // kliknięcie w head -> otwórz member permissions
             ItemStack clicked = event.getCurrentItem();
             if (clicked == null || !clicked.hasItemMeta()) return;
 
@@ -62,13 +58,11 @@ public class PermissionsGuiListener implements Listener {
             String guildTag = GUIContext.getGuildTagForMembersInv(viewerId);
             if (guildTag == null) return;
 
-            // otwórz member permissions GUI
             MemberPermissionsGUI.open(viewer, memberUuid, guildTag, perms);
             GUIContext.unregisterMembersInventory(viewerId);
             return;
         }
 
-        // Member permissions GUI
         if (title.startsWith("Uprawnienia: ")) {
             var ctx = GUIContext.getMemberContext(viewerId);
             if (ctx == null) return;
@@ -76,23 +70,17 @@ public class PermissionsGuiListener implements Listener {
             ItemStack clicked = event.getCurrentItem();
             if (clicked == null || !clicked.hasItemMeta()) return;
 
-            // Używamy ItemMeta.displayName() (Component) zamiast przestarzałego getDisplayName()
             ItemMeta itemMeta = clicked.getItemMeta();
             Component displayComp = itemMeta != null ? itemMeta.displayName() : null;
-            String display = displayComp != null
-                    ? PlainTextComponentSerializer.plainText().serialize(displayComp)
-                    : null;
-
+            String display = displayComp != null ? PlainTextComponentSerializer.plainText().serialize(displayComp) : null;
             if (display == null) return;
 
-            // back
             if (display.equalsIgnoreCase("Powrót")) {
                 ViewerUtils.openMembersGuiByGuildTag(viewer, ctx.guildTag, perms);
                 GUIContext.unregisterMemberPermissionsInventory(viewerId);
                 return;
             }
 
-            // toggles - nazwa zawiera typ
             if (display.contains("BREAK")) {
                 perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.BREAK);
             } else if (display.contains("PLACE")) {
@@ -103,8 +91,14 @@ public class PermissionsGuiListener implements Listener {
                 perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.PVP);
             }
 
-            // odśwież GUI dla tej samej osoby
             MemberPermissionsGUI.open(viewer, ctx.member, ctx.guildTag, perms);
         }
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        UUID viewerId = event.getPlayer().getUniqueId();
+        GUIContext.unregisterMembersInventory(viewerId);
+        GUIContext.unregisterMemberPermissionsInventory(viewerId);
     }
 }

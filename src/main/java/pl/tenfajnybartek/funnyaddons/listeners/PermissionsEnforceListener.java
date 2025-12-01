@@ -13,8 +13,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.InventoryHolder;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
 import pl.tenfajnybartek.funnyaddons.utils.ChatUtils;
+import pl.tenfajnybartek.funnyaddons.utils.GUIHolder;
 import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 
 public class PermissionsEnforceListener implements Listener {
@@ -71,6 +73,12 @@ public class PermissionsEnforceListener implements Listener {
     public void onOpenInventory(InventoryOpenEvent event) {
         if (!(event.getPlayer() instanceof Player p)) return;
 
+        // Jeżeli holder jest naszym GuiHolder => to jest custom GUI i ignorujemy
+        InventoryHolder holder = event.getInventory().getHolder();
+        if (holder instanceof GUIHolder) {
+            return;
+        }
+
         // Jeżeli to nie jest "kontener" (skrzynia/hopper/barrel/ender...), ignorujemy event (np. GUI pluginu/kreative)
         InventoryType type = event.getInventory().getType();
         if (!isContainerType(type)) {
@@ -113,7 +121,6 @@ public class PermissionsEnforceListener implements Listener {
     }
 
     private boolean isOwner(User user, Guild guild) {
-        // TODO: dopasuj do API FunnyGuilds: sprawdź czy user jest ownerem gildii
         try {
             Object owner = guild.getOwner();
             if (owner != null && owner.toString().equalsIgnoreCase(user.getName())) {
