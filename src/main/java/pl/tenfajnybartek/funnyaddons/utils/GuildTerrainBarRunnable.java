@@ -71,8 +71,6 @@ public class GuildTerrainBarRunnable implements Runnable {
             case BOSS_BAR: {
                 BossBarConfig.BossBarMessage bbMsg = this.bossBarConfig.getBossBarMessage(relation.name());
                 if (bbMsg == null) {
-                    // Remove the bossbar entirely instead of just hiding it
-                    // This prevents "stale" bossbars from being shown
                     this.bossBarManager.remove(player);
                     return;
                 }
