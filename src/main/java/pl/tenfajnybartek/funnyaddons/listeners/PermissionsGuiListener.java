@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import pl.tenfajnybartek.funnyaddons.base.FunnyAddons;
+import pl.tenfajnybartek.funnyaddons.config.PermissionsConfig;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
 import pl.tenfajnybartek.funnyaddons.permissions.MemberPermissionsGUI;
 import pl.tenfajnybartek.funnyaddons.utils.GUIContext;
@@ -42,68 +43,106 @@ public class PermissionsGuiListener implements Listener {
 
         event.setCancelled(true);
 
-        Component titleComp = event.getView().title();
-        String title = PlainTextComponentSerializer.plainText().serialize(titleComp);
+        PermissionsConfig permCfg = plugin.getConfigManager().getPermissionsConfig();
 
-        if (title.startsWith("Gildia: ")) {
-            ItemStack clicked = event.getCurrentItem();
-            if (clicked == null || !clicked.hasItemMeta()) return;
-
-            UUID memberUuid = null;
-            try {
-                var meta = clicked.getItemMeta();
-                var owner = meta instanceof org.bukkit.inventory.meta.SkullMeta ? ((org.bukkit.inventory.meta.SkullMeta) meta).getOwningPlayer() : null;
-                if (owner != null) memberUuid = owner.getUniqueId();
-            } catch (Exception ignored) {}
-
-            if (memberUuid == null) return;
-
-            String guildTag = GUIContext.getGuildTagForMembersInv(viewerId);
-            if (guildTag == null) return;
-
-            MemberPermissionsGUI.open(viewer, memberUuid, guildTag, perms, plugin);
-            GUIContext.unregisterMembersInventory(viewerId);
+        // Handle members list inventory
+        if (isMembersInv && !isMemberPermInv) {
+            handleMembersListClick(event, viewer, viewerId);
             return;
         }
 
-        if (title.startsWith("Uprawnienia: ")) {
-            var ctx = GUIContext.getMemberContext(viewerId);
-            if (ctx == null) return;
+        // Handle member permissions inventory
+        if (isMemberPermInv) {
+            handleMemberPermissionsClick(event, viewer, viewerId, permCfg);
+        }
+    }
 
-            ItemStack clicked = event.getCurrentItem();
-            if (clicked == null || !clicked.hasItemMeta()) return;
+    private void handleMembersListClick(InventoryClickEvent event, Player viewer, UUID viewerId) {
+        ItemStack clicked = event.getCurrentItem();
+        if (clicked == null || !clicked.hasItemMeta()) return;
 
+        UUID memberUuid = null;
+        try {
+            var meta = clicked.getItemMeta();
+            var owner = meta instanceof org.bukkit.inventory.meta.SkullMeta ? ((org.bukkit.inventory.meta.SkullMeta) meta).getOwningPlayer() : null;
+            if (owner != null) memberUuid = owner.getUniqueId();
+        } catch (Exception ignored) {}
+
+        if (memberUuid == null) return;
+
+        String guildTag = GUIContext.getGuildTagForMembersInv(viewerId);
+        if (guildTag == null) return;
+
+        MemberPermissionsGUI.open(viewer, memberUuid, guildTag, perms, plugin);
+        GUIContext.unregisterMembersInventory(viewerId);
+    }
+
+    private void handleMemberPermissionsClick(InventoryClickEvent event, Player viewer, UUID viewerId, PermissionsConfig permCfg) {
+        var ctx = GUIContext.getMemberContext(viewerId);
+        if (ctx == null) return;
+
+        ItemStack clicked = event.getCurrentItem();
+        if (clicked == null || !clicked.hasItemMeta()) return;
+
+        int slot = event.getSlot();
+        int size = event.getInventory().getSize();
+
+        // Check back button first (slot-based or name-based for compatibility)
+        int backSlot = permCfg.getBackSlot();
+        if (backSlot >= size) {
+            backSlot = size - 1;
+        }
+        if (slot == backSlot) {
+            // Check if it's actually the back item by verifying material or name
             ItemMeta itemMeta = clicked.getItemMeta();
             Component displayComp = itemMeta != null ? itemMeta.displayName() : null;
             String display = displayComp != null ? PlainTextComponentSerializer.plainText().serialize(displayComp) : null;
-            if (display == null) return;
+            String backName = PlainTextComponentSerializer.plainText().serialize(
+                    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacyAmpersand()
+                            .deserialize(permCfg.getBackName()));
 
-            if (display.equalsIgnoreCase("Powrót")) {
+            if (display != null && display.equals(backName)) {
                 ViewerUtils.openMembersGuiByGuildTag(viewer, ctx.guildTag, perms);
                 GUIContext.unregisterMemberPermissionsInventory(viewerId);
                 return;
             }
+        }
 
-            if (display.contains("BREAK")) {
-                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.BREAK);
-            } else if (display.contains("PLACE")) {
-                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.PLACE);
-            } else if (display.contains("INTERACT_BLOCK")) {
-                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.INTERACT_BLOCK);
-            } else if (display.contains("OPEN_CHEST")) {
-                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.OPEN_CHEST);
-            } else if (display.contains("OPEN_ENDER_CHEST")) {
-                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.OPEN_ENDER_CHEST);
-            } else if (display.contains("USE_BUCKETS")) {
-                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.USE_BUCKETS);
-            } else if (display.contains("USE_FIRE")) {
-                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.USE_FIRE);
-            } else if (display.contains("FRIENDLY_FIRE")) {
-                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.FRIENDLY_FIRE);
-            }
+        // Use slot-based detection for permission toggles (config-driven)
+        PermissionType toggledType = getPermissionTypeBySlot(slot, permCfg);
 
+        if (toggledType != null) {
+            perms.togglePermission(ctx.guildTag, ctx.member, toggledType);
             MemberPermissionsGUI.open(viewer, ctx.member, ctx.guildTag, perms, plugin);
         }
+    }
+
+    /**
+     * Gets the PermissionType for a given slot based on config.
+     *
+     * @param slot    The clicked slot
+     * @param permCfg The permissions config
+     * @return The PermissionType for the slot, or null if not a permission toggle slot
+     */
+    private PermissionType getPermissionTypeBySlot(int slot, PermissionsConfig permCfg) {
+        if (slot == permCfg.getBreakSlot()) {
+            return PermissionType.BREAK;
+        } else if (slot == permCfg.getPlaceSlot()) {
+            return PermissionType.PLACE;
+        } else if (slot == permCfg.getInteractBlockSlot()) {
+            return PermissionType.INTERACT_BLOCK;
+        } else if (slot == permCfg.getOpenChestSlot()) {
+            return PermissionType.OPEN_CHEST;
+        } else if (slot == permCfg.getOpenEnderChestSlot()) {
+            return PermissionType.OPEN_ENDER_CHEST;
+        } else if (slot == permCfg.getUseBucketsSlot()) {
+            return PermissionType.USE_BUCKETS;
+        } else if (slot == permCfg.getUseFireSlot()) {
+            return PermissionType.USE_FIRE;
+        } else if (slot == permCfg.getFriendlyFireSlot()) {
+            return PermissionType.FRIENDLY_FIRE;
+        }
+        return null;
     }
 
     @EventHandler

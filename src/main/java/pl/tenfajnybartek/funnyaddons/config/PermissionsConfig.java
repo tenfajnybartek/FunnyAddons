@@ -67,6 +67,162 @@ public class PermissionsConfig {
         );
     }
 
+    // ---------- Slots ----------
+
+    /**
+     * Gets the slot for a permission type from config.
+     *
+     * @param key      The PermissionsConfigKey for the slot
+     * @return The configured slot number
+     */
+    public int getSlot(PermissionsConfigKey key) {
+        return cfg.getInt(key.getPath(), key.getDefaultInt());
+    }
+
+    public int getBreakSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_BREAK);
+    }
+
+    public int getPlaceSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_PLACE);
+    }
+
+    public int getInteractBlockSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_INTERACT_BLOCK);
+    }
+
+    public int getOpenChestSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_OPEN_CHEST);
+    }
+
+    public int getOpenEnderChestSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_OPEN_ENDER_CHEST);
+    }
+
+    public int getUseBucketsSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_USE_BUCKETS);
+    }
+
+    public int getUseFireSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_USE_FIRE);
+    }
+
+    public int getFriendlyFireSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_FRIENDLY_FIRE);
+    }
+
+    public int getBackSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_BACK);
+    }
+
+    public int getInfoSlot() {
+        return getSlot(PermissionsConfigKey.SLOT_INFO);
+    }
+
+    // ---------- Display Names ----------
+
+    /**
+     * Gets the display name for a permission type from config.
+     *
+     * @param key The PermissionsConfigKey for the name
+     * @return The configured display name
+     */
+    public String getName(PermissionsConfigKey key) {
+        return cfg.getString(key.getPath(), key.getDefaultString());
+    }
+
+    public String getBreakName() {
+        return getName(PermissionsConfigKey.NAME_BREAK);
+    }
+
+    public String getPlaceName() {
+        return getName(PermissionsConfigKey.NAME_PLACE);
+    }
+
+    public String getInteractBlockName() {
+        return getName(PermissionsConfigKey.NAME_INTERACT_BLOCK);
+    }
+
+    public String getOpenChestName() {
+        return getName(PermissionsConfigKey.NAME_OPEN_CHEST);
+    }
+
+    public String getOpenEnderChestName() {
+        return getName(PermissionsConfigKey.NAME_OPEN_ENDER_CHEST);
+    }
+
+    public String getUseBucketsName() {
+        return getName(PermissionsConfigKey.NAME_USE_BUCKETS);
+    }
+
+    public String getUseFireName() {
+        return getName(PermissionsConfigKey.NAME_USE_FIRE);
+    }
+
+    public String getFriendlyFireName() {
+        return getName(PermissionsConfigKey.NAME_FRIENDLY_FIRE);
+    }
+
+    public String getBackName() {
+        return getName(PermissionsConfigKey.NAME_BACK);
+    }
+
+    public String getInfoName() {
+        return getName(PermissionsConfigKey.NAME_INFO);
+    }
+
+    // ---------- Lore ----------
+
+    /**
+     * Gets the toggle lore from config.
+     *
+     * @return The configured toggle lore
+     */
+    public String getToggleLore() {
+        return cfg.getString(
+                PermissionsConfigKey.LORE_TOGGLE.getPath(),
+                PermissionsConfigKey.LORE_TOGGLE.getDefaultString()
+        );
+    }
+
+    /**
+     * Gets the info lore from config.
+     *
+     * @return The configured info lore
+     */
+    public String getInfoLore() {
+        return cfg.getString(
+                PermissionsConfigKey.LORE_INFO.getPath(),
+                PermissionsConfigKey.LORE_INFO.getDefaultString()
+        );
+    }
+
+    // ---------- State Prefixes ----------
+
+    /**
+     * Gets the state prefix for ON state from config.
+     *
+     * @return The configured state prefix
+     */
+    public String getStateOn() {
+        return cfg.getString(
+                PermissionsConfigKey.STATE_ON.getPath(),
+                PermissionsConfigKey.STATE_ON.getDefaultString()
+        );
+    }
+
+    /**
+     * Gets the state prefix for OFF state from config.
+     *
+     * @return The configured state prefix
+     */
+    public String getStateOff() {
+        return cfg.getString(
+                PermissionsConfigKey.STATE_OFF.getPath(),
+                PermissionsConfigKey.STATE_OFF.getDefaultString()
+        );
+    }
+
     // ---------- Icons ----------
 
     /**

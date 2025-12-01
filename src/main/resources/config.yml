@@ -106,6 +106,37 @@ permissions:
     members-title: "&cGildia: &e{GUILD} - członkowie"
     member-perms-title: "&cUprawnienia: &e{GUILD} - {NAME}"
     title-max-length: 32
+    # Slot configuration for permission toggles in MemberPermissionsGUI
+    slots:
+      break: 10
+      place: 11
+      interact_block: 12
+      open_chest: 14
+      open_ender_chest: 15
+      use_buckets: 16
+      use_fire: 19
+      friendly_fire: 21
+      back: 26  # size - 1, dynamically adjusted
+      info: 13  # player head slot, dynamically adjusted
+    # Display names for permission toggles (use {STATE} for ON/OFF prefix)
+    names:
+      break: "&aNiszczenie bloków"
+      place: "&aStawianie bloków"
+      interact_block: "&aInterakcja z blokami"
+      open_chest: "&aOtwieranie skrzyń"
+      open_ender_chest: "&aOtwieranie ender chestów"
+      use_buckets: "&aUżywanie kubełków"
+      use_fire: "&aUżywanie flint & steel"
+      friendly_fire: "&aFriendly fire"
+      back: "&cPowrót"
+      info: "&eKliknij aby ustawić uprawnienia"
+    # Lore for toggle items
+    lore:
+      toggle: "&7Kliknij aby przełączyć"
+      info: "&7Kliknij aby ustawić uprawnienia"
+    # State prefixes for toggle items
+    state-on: "&a[ON] "
+    state-off: "&c[OFF] "
 
   icons:
     break: DIAMOND_PICKAXE
