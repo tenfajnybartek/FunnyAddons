@@ -8,6 +8,7 @@ import pl.tenfajnybartek.funnyaddons.commands.BuyCoordsCommand;
 import pl.tenfajnybartek.funnyaddons.commands.FreeSpaceCommand;
 import pl.tenfajnybartek.funnyaddons.commands.PermissionsCommand;
 import pl.tenfajnybartek.funnyaddons.commands.ReloadConfigCommand;
+import pl.tenfajnybartek.funnyaddons.listeners.GuildEventListener;
 import pl.tenfajnybartek.funnyaddons.listeners.GuildTerrainBarJoinListener;
 import pl.tenfajnybartek.funnyaddons.listeners.PlayerPositionHandler;
 import pl.tenfajnybartek.funnyaddons.listeners.PermissionsEnforceListener;
@@ -138,6 +139,10 @@ public final class FunnyAddons extends JavaPlugin {
         );
         getServer().getPluginManager().registerEvents(new BossBarHandler(bossBarManager), this);
         getServer().getPluginManager().registerEvents(new PlayerPositionHandler(playerPositionManager), this);
+        getServer().getPluginManager().registerEvents(
+                new GuildEventListener(playerPositionManager, bossBarManager, terrainBarRunnable, configManager),
+                this
+        );
 
         logInfo("BossBary i obsługa pozycjonowania graczy włączona.");
     }
