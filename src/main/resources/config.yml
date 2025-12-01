@@ -1,8 +1,11 @@
 # FunnyAddons - config.yml
+# Uwaga:
+# - Kolory: używaj & zamiast §, plugin konwertuje je do Adventure
+# - Placeholdery: {GUILD}, {GUILD-TAG}, {GUILD-NAME}, {X}, {Z}, {DISTANCE}, {PLAYER}, {PERM}, {STATE}, {ITEM}, {AMOUNT}, {TAG-SHORT}, {TAG-LONG}
 
-#### KUPOWANIE KORDÓW ZA ITEMY: ###
-item: EMERALD_BLOCK
-amount: 64
+#### KUPOWANIE KORDÓW ZA ITEMY ####
+item: EMERALD_BLOCK       # Jaki item jest walutą
+amount: 64                 # Ile itemów potrzeba
 
 item-lack:
   - ""
@@ -28,10 +31,10 @@ buy-cords:
 
 reload: "&aPomyślnie przeładowano config!"
 
-### BOSSBAR ###
+### BOSSBAR / ACTIONBAR ###
 bossbar:
-  mode: BOSS_BAR      # Dostępne: BOSS_BAR, ACTION_BAR
-  runnable-time: 15   # co ile ticków (wartość w tickach - 20 = 1s)
+  mode: BOSS_BAR      # Dostępne: BOSS_BAR, ACTION_BAR (integracja z BossBarConfig)
+  runnable-time: 15   # co ile ticków odświeża się bossbar (20 = 1s)
   progress-based-on-distance: true
   messages:
     MEMBER:
@@ -62,7 +65,7 @@ listSize: 10
 generationTime: 10 # 1 = 1 sekunda
 
 # ---------------------------
-# WIADOMOŚCI (używaj tylko tej sekcji messages)
+# WIADOMOŚCI (część używana przez MessagesConfig / ConfigManager)
 # ---------------------------
 messages:
   # ogólne / błędy
@@ -81,7 +84,7 @@ messages:
     - "&aKordy serca gildii: &eX: {X} Z: {Z}"
     - ""
 
-  # perms - komunikaty egzekwowania
+  # perms - komunikaty egzekwowania uprawnień (PermissionsEnforceListener itp.)
   perms-no-break: "&cNie masz uprawnień do niszczenia na terenie tej gildii!"
   perms-no-place: "&cNie masz uprawnień do stawiania bloków na terenie tej gildii!"
   perms-no-open-chest: "&cNie masz uprawnień do otwierania skrzyń na terenie tej gildii!"
@@ -91,14 +94,14 @@ messages:
   perms-no-fire: "&cNie masz uprawnień do używania flinta i stali (odpalenie) na terenie tej gildii!"
   perms-no-friendly-fire: "&cNie możesz obrażać członków swojej gildii!"
 
-  # GUI / potwierdzenia
+  # GUI / potwierdzenia (PermissionsCommand / GUI)
   perms-given: "&aNadano uprawnienie &e{PERM} &agraczowi &e{PLAYER} &aw gildii &e{GUILD}"
   perms-revoked: "&cOdebrano uprawnienie &e{PERM} &cgraczowi &e{PLAYER} &cw gildii &e{GUILD}"
   perms-toggle: "&ePrzełączono uprawnienie &6{PERM} &edla &f{PLAYER}&e - teraz: &a{STATE}"
   perms-opened: "&aOtworzono panel uprawnień gildii &e{GUILD}"
 
 # ---------------------------
-# UPRAWNIENIA (permissions module)
+# UPRAWNIENIA (permissions module – PermissionsConfig / PermissionType / GUI)
 # ---------------------------
 permissions:
   gui:
@@ -106,7 +109,8 @@ permissions:
     members-title: "&cGildia: &e{GUILD} - członkowie"
     member-perms-title: "&cUprawnienia: &e{GUILD} - {NAME}"
     title-max-length: 32
-    # Slot configuration for permission toggles in MemberPermissionsGUI
+
+    # Sloty dla MemberPermissionsGUI (dynamicznie odczytywane przez PermissionsConfig)
     slots:
       break: 10
       place: 11
@@ -116,9 +120,10 @@ permissions:
       use_buckets: 16
       use_fire: 19
       friendly_fire: 21
-      back: 26  # size - 1, dynamically adjusted
-      info: 13  # player head slot, dynamically adjusted
-    # Display names for permission toggles (use {STATE} for ON/OFF prefix)
+      back: 26  # zwykle size - 1
+      info: 13  # głowa gracza
+
+    # Nazwy dla toggle'ów (używaj {STATE} jeśli chcesz mieć prefiks ON/OFF)
     names:
       break: "&aNiszczenie bloków"
       place: "&aStawianie bloków"
@@ -130,14 +135,16 @@ permissions:
       friendly_fire: "&aFriendly fire"
       back: "&cPowrót"
       info: "&eKliknij aby ustawić uprawnienia"
-    # Lore for toggle items
+
     lore:
       toggle: "&7Kliknij aby przełączyć"
       info: "&7Kliknij aby ustawić uprawnienia"
-    # State prefixes for toggle items
+
+    # Prefiksy stanów przełączników
     state-on: "&a[ON] "
     state-off: "&c[OFF] "
 
+  # Ikony dla poszczególnych typów uprawnień (PermissionsConfig / PermissionType)
   icons:
     break: DIAMOND_PICKAXE
     place: OAK_PLANKS
@@ -150,6 +157,7 @@ permissions:
     back: BARRIER
     info: PLAYER_HEAD
 
+  # Domyślne permisje dla ról (trzymane jako nazwy enuma PermissionType)
   defaults:
     member: []
     officer:
@@ -167,9 +175,10 @@ permissions:
       - USE_FIRE
       - FRIENDLY_FIRE
 
+  # Relacje – czy permisje mają się „podążać” za relacją FG / Addon
   relation:
     enable: false
-    default-behavior: "follow_fg"
+    default-behavior: "follow_fg"  # follow_fg lub follow_addon
     RELATION:
       MEMBER:
         enforce: true
