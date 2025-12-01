@@ -7,10 +7,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.tenfajnybartek.funnyaddons.config.BossBarConfig;
 import pl.tenfajnybartek.funnyaddons.config.MessagesConfig;
+import pl.tenfajnybartek.funnyaddons.config.PanelConfig;
 import pl.tenfajnybartek.funnyaddons.config.PermissionsConfig;
 import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 
 import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,25 +22,47 @@ public class ConfigManager {
 
     private final JavaPlugin plugin;
     private FileConfiguration cfg;
+    private FileConfiguration panelCfg;
     private final File configFile;
+    private final File panelFile;
 
     // Config sub-classes for organized access
     private MessagesConfig messagesConfig;
     private PermissionsConfig permissionsConfig;
     private BossBarConfig bossBarConfig;
+    private PanelConfig panelConfig;
 
     public ConfigManager(JavaPlugin plugin) {
         this.plugin = plugin;
         plugin.saveDefaultConfig();
         this.configFile = new File(plugin.getDataFolder(), "config.yml");
+        this.panelFile = new File(plugin.getDataFolder(), "panel.yml");
         this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
+
+        // Save and load panel.yml
+        saveDefaultPanelConfig();
+        this.panelCfg = YamlConfiguration.loadConfiguration(this.panelFile);
+
         initConfigFacades();
+    }
+
+    private void saveDefaultPanelConfig() {
+        if (!panelFile.exists()) {
+            try (InputStream in = plugin.getResource("panel.yml")) {
+                if (in != null) {
+                    Files.copy(in, panelFile.toPath());
+                }
+            } catch (Exception e) {
+                plugin.getLogger().warning("Could not save default panel.yml: " + e.getMessage());
+            }
+        }
     }
 
     private void initConfigFacades() {
         this.messagesConfig = new MessagesConfig(this.cfg);
         this.permissionsConfig = new PermissionsConfig(this.cfg);
         this.bossBarConfig = new BossBarConfig(this.cfg);
+        this.panelConfig = new PanelConfig(this.panelCfg);
     }
 
     // ---------- Factory methods for config sub-classes ----------
@@ -63,6 +88,13 @@ public class ConfigManager {
         return bossBarConfig;
     }
 
+    /**
+     * Gets the PanelConfig facade for guild panel-related configuration.
+     */
+    public PanelConfig getPanelConfig() {
+        return panelConfig;
+    }
+
     public FileConfiguration getConfig() {
         return cfg;
     }
@@ -78,6 +110,7 @@ public class ConfigManager {
     public void reload() {
         plugin.reloadConfig();
         this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
+        this.panelCfg = YamlConfiguration.loadConfiguration(this.panelFile);
         initConfigFacades();
     }
 

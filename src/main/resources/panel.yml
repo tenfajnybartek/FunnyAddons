@@ -1,0 +1,274 @@
+# FunnyAddons - Panel Gildii (panel.yml)
+# Konfiguracja GUI panelu gildii dostępnego przez /panel lub /gpanel
+# Dostępne placeholdery:
+#   {TAG}, {NAME}, {POINTS}, {KILLS}, {LEADER}, {VICE}, {MEMBERS},
+#   {TERRAIN_LEVEL}, {BOUNDS}, {EXPIRES}, {RENEW_DURATION}, {RENEW_COST}, {COST}
+
+# Wiadomości panelu
+messages:
+  only-player: "&cTylko gracz może użyć tej komendy!"
+  not-in-guild: "&cMusisz być w gildii, aby użyć tej komendy!"
+  not-leader: "&cTylko lider gildii może używać panelu!"
+  no-money: "&cNie masz wystarczająco przedmiotów! Potrzebujesz: &e{COST}"
+  territory-upgraded: "&aPomyślnie powiększono teren gildii do poziomu &e{LEVEL}&a!"
+  territory-max-level: "&cOsiągnąłeś maksymalny poziom terenu!"
+  territory-already-owned: "&cPosiadasz już ten poziom terenu!"
+  validity-extended: "&aPomyślnie przedłużono ważność gildii o &e{DURATION}&a!"
+  effect-purchased: "&aPomyślnie zakupiono efekt &e{EFFECT} &adla całej gildii!"
+  effect-applied: "&aOtrzymałeś efekt &e{EFFECT} &aod lidera gildii!"
+
+# Główne GUI panelu gildii
+panel:
+  main:
+    size: 27
+    title: "&ePanel Gildii"
+    items:
+      territory:
+        slot: 10
+        material: GRASS_BLOCK
+        name: "&aPowiększ teren gildii"
+        lore:
+          - "&7Aktualny poziom: &e{TERRAIN_LEVEL} &7(&e{BOUNDS}x{BOUNDS}&7)"
+          - ""
+          - "&7Kliknij, aby przejść do menu powiększania"
+      info:
+        slot: 13
+        material: BOOK
+        name: "&bInformacje o gildii"
+        lore:
+          - "&7Tag: &e{TAG}"
+          - "&7Nazwa: &e{NAME}"
+          - "&7Punkty: &e{POINTS}"
+          - "&7Kille: &e{KILLS}"
+          - "&7Lider: &e{LEADER}"
+          - "&7Zastępca: &e{VICE}"
+          - "&7Członków: &e{MEMBERS}"
+      renew:
+        slot: 16
+        material: CLOCK
+        name: "&aPrzedłuż ważność gildii"
+        lore:
+          - "&7Aktualna ważność: &e{EXPIRES}"
+          - "&7Przedłuż o: &e{RENEW_DURATION}"
+          - "&7Koszt: &e{RENEW_COST}"
+          - ""
+          - "&7Kliknij, aby przedłużyć"
+      effects:
+        slot: 11
+        material: BEACON
+        name: "&dEfekty gildii"
+        lore:
+          - "&7Kup efekty dla wszystkich członków online"
+          - ""
+          - "&7Kliknij, aby otworzyć menu efektów"
+      permissions:
+        slot: 15
+        material: PAPER
+        name: "&eUprawnienia członków gildii"
+        lore:
+          - "&7Otwiera panel zarządzania uprawnieniami"
+          - ""
+          - "&7Kliknij, aby przejść do uprawnień"
+      close:
+        slot: 26
+        material: BARRIER
+        name: "&cZamknij"
+        lore:
+          - "&7Zamknij panel"
+
+  # Konfiguracja powiększania terenu
+  territory:
+    size: 27
+    title: "&aPowiększenie terenu gildii"
+    levels:
+      1:
+        bounds: 50
+        active-material: GREEN_CONCRETE
+        inactive-material: RED_CONCRETE
+        name: "&aPoziom 1 &7({BOUNDS}x{BOUNDS})"
+        lore-active:
+          - "&aObecny poziom terenu"
+        lore-inactive:
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        slot: 10
+        cost: {}
+      2:
+        bounds: 55
+        active-material: GREEN_CONCRETE
+        inactive-material: RED_CONCRETE
+        name: "&aPoziom 2 &7({BOUNDS}x{BOUNDS})"
+        lore-active:
+          - "&aObecny poziom terenu"
+        lore-inactive:
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        slot: 11
+        cost:
+          EMERALD_BLOCK: 64
+      3:
+        bounds: 60
+        active-material: GREEN_CONCRETE
+        inactive-material: RED_CONCRETE
+        name: "&aPoziom 3 &7({BOUNDS}x{BOUNDS})"
+        lore-active:
+          - "&aObecny poziom terenu"
+        lore-inactive:
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        slot: 12
+        cost:
+          EMERALD_BLOCK: 128
+      4:
+        bounds: 70
+        active-material: GREEN_CONCRETE
+        inactive-material: RED_CONCRETE
+        name: "&aPoziom 4 &7({BOUNDS}x{BOUNDS})"
+        lore-active:
+          - "&aObecny poziom terenu"
+        lore-inactive:
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        slot: 13
+        cost:
+          EMERALD_BLOCK: 192
+      5:
+        bounds: 75
+        active-material: GREEN_CONCRETE
+        inactive-material: RED_CONCRETE
+        name: "&aPoziom 5 &7({BOUNDS}x{BOUNDS})"
+        lore-active:
+          - "&aObecny poziom terenu"
+        lore-inactive:
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        slot: 14
+        cost:
+          EMERALD_BLOCK: 256
+    back:
+      slot: 26
+      material: ARROW
+      name: "&cPowrót"
+      lore:
+        - "&7Wróć do głównego panelu"
+
+  # Konfiguracja przedłużenia ważności
+  renew:
+    duration-seconds: 604800  # 7 dni
+    cost:
+      EMERALD_BLOCK: 64
+
+  # Konfiguracja efektów gildii
+  effects:
+    size: 27
+    title: "&dEfekty gildii"
+    options:
+      strength_1:
+        slot: 10
+        material: BLAZE_POWDER
+        name: "&cSiła I"
+        lore:
+          - "&7Czas trwania: &e1 godzina"
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        effect: STRENGTH
+        amplifier: 0
+        duration-seconds: 3600
+        cost:
+          EMERALD_BLOCK: 128
+      strength_2:
+        slot: 11
+        material: BLAZE_POWDER
+        name: "&cSiła II"
+        lore:
+          - "&7Czas trwania: &e1 godzina"
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        effect: STRENGTH
+        amplifier: 1
+        duration-seconds: 3600
+        cost:
+          EMERALD_BLOCK: 192
+      speed_1:
+        slot: 12
+        material: SUGAR
+        name: "&bSzybkość I"
+        lore:
+          - "&7Czas trwania: &e1 godzina"
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        effect: SPEED
+        amplifier: 0
+        duration-seconds: 3600
+        cost:
+          EMERALD_BLOCK: 128
+      speed_2:
+        slot: 13
+        material: SUGAR
+        name: "&bSzybkość II"
+        lore:
+          - "&7Czas trwania: &e1 godzina"
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        effect: SPEED
+        amplifier: 1
+        duration-seconds: 3600
+        cost:
+          EMERALD_BLOCK: 192
+      haste_1:
+        slot: 14
+        material: GOLDEN_PICKAXE
+        name: "&eHaste I"
+        lore:
+          - "&7Czas trwania: &e1 godzina"
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        effect: HASTE
+        amplifier: 0
+        duration-seconds: 3600
+        cost:
+          EMERALD_BLOCK: 128
+      regeneration_1:
+        slot: 15
+        material: GHAST_TEAR
+        name: "&dRegeneracja I"
+        lore:
+          - "&7Czas trwania: &e1 godzina"
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        effect: REGENERATION
+        amplifier: 0
+        duration-seconds: 3600
+        cost:
+          EMERALD_BLOCK: 128
+      resistance_1:
+        slot: 16
+        material: IRON_CHESTPLATE
+        name: "&7Odporność I"
+        lore:
+          - "&7Czas trwania: &e1 godzina"
+          - "&7Koszt: &e{COST}"
+          - ""
+          - "&7Kliknij, aby zakupić"
+        effect: RESISTANCE
+        amplifier: 0
+        duration-seconds: 3600
+        cost:
+          EMERALD_BLOCK: 160
+    back:
+      slot: 26
+      material: ARROW
+      name: "&cPowrót"
+      lore:
+        - "&7Wróć do głównego panelu"

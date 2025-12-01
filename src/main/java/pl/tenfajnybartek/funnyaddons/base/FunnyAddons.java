@@ -17,6 +17,8 @@ import pl.tenfajnybartek.funnyaddons.bossbar.BossBarManager;
 import pl.tenfajnybartek.funnyaddons.bossbar.BossBarHandler;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
 import pl.tenfajnybartek.funnyaddons.managers.PlayerPositionManager;
+import pl.tenfajnybartek.funnyaddons.panel.PanelCommand;
+import pl.tenfajnybartek.funnyaddons.panel.PanelGuiListener;
 import pl.tenfajnybartek.funnyaddons.tasks.GenerateCoordinatesTask;
 import pl.tenfajnybartek.funnyaddons.utils.GuildTerrainBarRunnable;
 
@@ -40,6 +42,7 @@ public final class FunnyAddons extends JavaPlugin {
 
         initConfig();
         initPermissions();
+        initPanel();
         if (!initFunnyGuilds()) return;
         initCommands();
         initAsyncTasks();
@@ -60,6 +63,14 @@ public final class FunnyAddons extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PermissionsGuiListener(permissionsManager, this), this);
         getServer().getPluginManager().registerEvents(new PermissionsEnforceListener(permissionsManager), this);
+    }
+
+    private void initPanel() {
+        getServer().getPluginManager().registerEvents(
+                new PanelGuiListener(this, configManager.getPanelConfig()),
+                this
+        );
+        logInfo("Panel gildii zainicjalizowany.");
     }
 
     private boolean initFunnyGuilds() {
@@ -86,6 +97,7 @@ public final class FunnyAddons extends JavaPlugin {
         Objects.requireNonNull(getCommand("kupkordy")).setExecutor(new BuyCoordsCommand(configManager, guildManager));
         Objects.requireNonNull(getCommand("fgaddonsreload")).setExecutor(new ReloadConfigCommand(configManager, permissionsManager));
         Objects.requireNonNull(getCommand("uprawnienia")).setExecutor(new PermissionsCommand(this.getConfigManager(), permissionsManager));
+        Objects.requireNonNull(getCommand("panel")).setExecutor(new PanelCommand(this, configManager.getPanelConfig()));
         logInfo("Komendy zarejestrowane.");
     }
 

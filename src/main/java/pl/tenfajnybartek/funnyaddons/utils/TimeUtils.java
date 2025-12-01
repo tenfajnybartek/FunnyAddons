@@ -33,4 +33,41 @@ public class TimeUtils {
 
         return !stringBuilder.isEmpty() ? stringBuilder.toString().trim() : time + "ms";
     }
+
+    /**
+     * Formats a duration in seconds to a human-readable string.
+     *
+     * @param seconds Duration in seconds
+     * @return Formatted duration string (e.g., "7 dni", "2 godz. 30 min.")
+     */
+    public static String formatDuration(long seconds) {
+        if (seconds <= 0) {
+            return "0s";
+        }
+
+        long days = seconds / 86400;
+        long hours = (seconds % 86400) / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
+
+        StringBuilder sb = new StringBuilder();
+
+        if (days > 0) {
+            sb.append(days).append(days == 1 ? " dzień" : " dni");
+        }
+        if (hours > 0) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append(hours).append(hours == 1 ? " godz." : " godz.");
+        }
+        if (minutes > 0 && days == 0) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append(minutes).append(" min.");
+        }
+        if (secs > 0 && days == 0 && hours == 0) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append(secs).append("s");
+        }
+
+        return sb.length() > 0 ? sb.toString() : "0s";
+    }
 }

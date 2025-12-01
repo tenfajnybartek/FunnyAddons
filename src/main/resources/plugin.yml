@@ -24,3 +24,6 @@ commands:
   uprawnienia:
     aliases: [ guprawnienia ]
     description: Uprawnienia gildii
+  panel:
+    aliases: [ gpanel ]
+    description: Panel gildii - tylko dla lidera

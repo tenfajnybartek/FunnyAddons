@@ -7,7 +7,13 @@ import java.util.UUID;
 
 public class GUIHolder implements InventoryHolder {
 
-    public enum Kind { MEMBERS_LIST, MEMBER_PERMISSIONS }
+    public enum Kind {
+        MEMBERS_LIST,
+        MEMBER_PERMISSIONS,
+        GUILD_PANEL_MAIN,
+        GUILD_PANEL_TERRITORY,
+        GUILD_PANEL_EFFECTS
+    }
 
     private final Kind kind;
     private final String guildTag;
