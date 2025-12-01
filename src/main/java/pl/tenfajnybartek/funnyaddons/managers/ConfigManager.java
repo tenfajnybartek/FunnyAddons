@@ -1,12 +1,13 @@
 package pl.tenfajnybartek.funnyaddons.managers;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import pl.tenfajnybartek.funnyaddons.config.BossBarConfig;
+import pl.tenfajnybartek.funnyaddons.config.MessagesConfig;
+import pl.tenfajnybartek.funnyaddons.config.PermissionsConfig;
 
 import java.io.File;
 import java.util.HashMap;
@@ -18,13 +19,47 @@ public class ConfigManager {
     private final JavaPlugin plugin;
     private FileConfiguration cfg;
     private final File configFile;
-    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
+
+    // Config sub-classes for organized access
+    private MessagesConfig messagesConfig;
+    private PermissionsConfig permissionsConfig;
+    private BossBarConfig bossBarConfig;
 
     public ConfigManager(JavaPlugin plugin) {
         this.plugin = plugin;
         plugin.saveDefaultConfig();
         this.configFile = new File(plugin.getDataFolder(), "config.yml");
         this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
+        initConfigFacades();
+    }
+
+    private void initConfigFacades() {
+        this.messagesConfig = new MessagesConfig(this.cfg);
+        this.permissionsConfig = new PermissionsConfig(this.cfg);
+        this.bossBarConfig = new BossBarConfig(this.cfg);
+    }
+
+    // ---------- Factory methods for config sub-classes ----------
+
+    /**
+     * Gets the MessagesConfig facade for message-related configuration.
+     */
+    public MessagesConfig getMessagesConfig() {
+        return messagesConfig;
+    }
+
+    /**
+     * Gets the PermissionsConfig facade for permissions-related configuration.
+     */
+    public PermissionsConfig getPermissionsConfig() {
+        return permissionsConfig;
+    }
+
+    /**
+     * Gets the BossBarConfig facade for bossbar-related configuration.
+     */
+    public BossBarConfig getBossBarConfig() {
+        return bossBarConfig;
     }
 
     public FileConfiguration getConfig() {
@@ -32,24 +67,17 @@ public class ConfigManager {
     }
 
     public String getMessage(String key) {
-        return getMessage(key, "");
+        return messagesConfig.getMessage(key);
     }
 
     public String getMessage(String key, String defaultValue) {
-        if (key == null) return defaultValue;
-        String val;
-        if (key.startsWith("messages.")) {
-            val = cfg.getString(key, defaultValue);
-        } else {
-            val = cfg.getString("messages." + key, null);
-            if (val == null) val = cfg.getString(key, defaultValue);
-        }
-        return val != null ? val : defaultValue;
+        return messagesConfig.getMessage(key, defaultValue);
     }
 
     public void reload() {
         plugin.reloadConfig();
         this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
+        initConfigFacades();
     }
 
     public JavaPlugin getPlugin() {
@@ -57,26 +85,25 @@ public class ConfigManager {
     }
 
     // ---------- Convenience getters dla często używanych wiadomości ----------
+    // (Delegating to MessagesConfig for backward compatibility)
     public String getInGuildMessage() {
-        return getMessage("in-guild-message", "&cNie możesz użyć tej komendy, będąc w gildii!");
+        return messagesConfig.getInGuildMessage();
     }
 
     public String getNoPermissionMessage() {
-        return getMessage("no-permission", "&cNie masz uprawnień do tej akcji!");
+        return messagesConfig.getNoPermissionMessage();
     }
 
     public String getNoRegionMessage() {
-        return getMessage("no-region", "&cGildia/region nie odnaleziony!");
+        return messagesConfig.getNoRegionMessage();
     }
 
     public String getFreeSpaceMessage() {
-        return getMessage("free-space-message", "Lista wolnych lokalizacji na gildie");
+        return messagesConfig.getFreeSpaceMessage();
     }
 
     public String getLocationListMessage() {
-        String v = getMessage("location-list-message", "");
-        if (v.isEmpty()) v = getMessage("locationList", "x: {X}, z: {Z} - odleglosc {DISTANCE} metrow.");
-        return v;
+        return messagesConfig.getLocationListMessage();
     }
 
     // ---------- Pozostałe getters (Twoje dotychczasowe) ----------
@@ -96,59 +123,51 @@ public class ConfigManager {
         return getConfig().getInt("listSize", 20);
     }
 
+    // ---------- BossBar methods (delegating to BossBarConfig for backward compatibility) ----------
     public BossBarMessage getBossBarMessage(String relation) {
-        ConfigurationSection section = getConfig().getConfigurationSection("bossbar.messages." + relation);
-        if (section == null) return null;
-        return new BossBarMessage(
-                section.getString("message", ""),
-                section.getString("color", ""),
-                section.getString("style", "")
-        );
+        BossBarConfig.BossBarMessage msg = bossBarConfig.getBossBarMessage(relation);
+        if (msg == null) return null;
+        return new BossBarMessage(msg.getMessage(), msg.getColor(), msg.getStyle());
     }
 
     public String getActionBarMessage(String relation) {
-        return getConfig().getString("actionbar.messages." + relation, "");
+        return bossBarConfig.getActionBarMessage(relation);
     }
 
     public Map<String, BossBarMessage> getBossBarMessages() {
         Map<String, BossBarMessage> map = new HashMap<>();
-        ConfigurationSection messages = getConfig().getConfigurationSection("bossbar.messages");
-        if (messages != null) {
-            for (String key : messages.getKeys(false)) {
-                BossBarMessage bbMsg = getBossBarMessage(key);
-                if (bbMsg != null) map.put(key, bbMsg);
-            }
+        Map<String, BossBarConfig.BossBarMessage> srcMap = bossBarConfig.getAllBossBarMessages();
+        for (Map.Entry<String, BossBarConfig.BossBarMessage> entry : srcMap.entrySet()) {
+            BossBarConfig.BossBarMessage msg = entry.getValue();
+            map.put(entry.getKey(), new BossBarMessage(msg.getMessage(), msg.getColor(), msg.getStyle()));
         }
         return map;
     }
 
     public Map<String, String> getActionBarMessages() {
-        Map<String, String> map = new HashMap<>();
-        ConfigurationSection messages = getConfig().getConfigurationSection("actionbar.messages");
-        if (messages != null) {
-            for (String key : messages.getKeys(false)) {
-                map.put(key, messages.getString(key, ""));
-            }
-        }
-        return map;
+        return bossBarConfig.getAllActionBarMessages();
     }
 
     public String getBossBarMode() {
-        return getConfig().getString("bossbar.mode", "BOSS_BAR");
+        return bossBarConfig.getMode();
     }
 
     public String getBossBarPermission() {
-        return getConfig().getString("bossbar.reload-permission", "tguildterrainbar.reload");
+        return bossBarConfig.getReloadPermission();
     }
 
     public int getBossBarRunnableTime() {
-        return getConfig().getInt("bossbar.runnable-time", 15);
+        return bossBarConfig.getRunnableTime();
     }
 
     public boolean isBossBarProgressBasedOnDistance() {
-        return getConfig().getBoolean("bossbar.progress-based-on-distance", true);
+        return bossBarConfig.isProgressBasedOnDistance();
     }
 
+    /**
+     * @deprecated Use BossBarConfig.BossBarMessage from getBossBarConfig() instead.
+     */
+    @Deprecated
     public static class BossBarMessage {
         public final String message;
         public final String color;
@@ -161,73 +180,68 @@ public class ConfigManager {
         }
     }
 
-    // -----------------------------
-    // Nowe getters związane z permissions/gui/icons/relation
-    // -----------------------------
+    // ---------- Permissions methods (delegating to PermissionsConfig for backward compatibility) ----------
 
     // Rozmiar GUI dla MemberPermissionsGUI (domyślnie 27)
     public int getMemberPermissionsSize() {
-        return getConfig().getInt("permissions.gui.member-permissions-size", 27);
+        return permissionsConfig.getMemberPermissionsSize();
     }
 
     // Maksymalna długość tytułu inventory (klient) - domyślnie 32
     public int getTitleMaxLength() {
-        return getConfig().getInt("permissions.gui.title-max-length", 32);
+        return permissionsConfig.getTitleMaxLength();
     }
 
     // Pobierz Material z config.permissions.icons.{key} z fallbackiem
     public Material getIcon(String key, Material fallback) {
-        String path = "permissions.icons." + key;
-        String mat = getConfig().getString(path, null);
-        if (mat == null || mat.isBlank()) return fallback;
-        Material m = Material.matchMaterial(mat);
-        return m != null ? m : fallback;
+        return permissionsConfig.getIcon(key, fallback);
     }
 
     // Domyślne uprawnienia dla roli (member/officer/owner) - lista Stringów
     public List<String> getDefaultPerms(String role) {
-        return getConfig().getStringList("permissions.defaults." + role);
+        return permissionsConfig.getDefaultPerms(role);
     }
 
     // Czy relacje mają być włączone (relation.enable)
     public boolean isRelationEnabled() {
-        return getConfig().getBoolean("permissions.relation.enable", false);
+        return permissionsConfig.isRelationEnabled();
     }
 
     // domyślne zachowanie relacji (follow_fg / follow_addon)
     public String getRelationDefaultBehavior() {
-        return getConfig().getString("permissions.relation.default-behavior", "follow_fg");
+        return permissionsConfig.getRelationDefaultBehavior();
     }
 
-    // shortcuty do komunikatów perms-no-* (String)
-    public String getPermsNoBreakMessage() { return getMessage("perms-no-break", "&cNie masz uprawnień do niszczenia na terenie tej gildii!"); }
-    public String getPermsNoPlaceMessage() { return getMessage("perms-no-place", "&cNie masz uprawnień do stawiania bloków na terenie tej gildii!"); }
-    public String getPermsNoOpenChestMessage() { return getMessage("perms-no-open-chest", "&cNie masz uprawnień do otwierania skrzyń na terenie tej gildii!"); }
-    public String getPermsNoOpenEnderMessage() { return getMessage("perms-no-open-ender", "&cNie masz uprawnień do otwierania ender chesta na terenie tej gildii!"); }
-    public String getPermsNoInteractMessage() { return getMessage("perms-no-interact", "&cNie masz uprawnień do używania przycisków/dźwigni/drzwi na terenie tej gildii!"); }
-    public String getPermsNoBucketsMessage() { return getMessage("perms-no-buckets", "&cNie masz uprawnień do używania kubełków na terenie tej gildii!"); }
-    public String getPermsNoFireMessage() { return getMessage("perms-no-fire", "&cNie masz uprawnień do używania flinta i stali (odpalenie) na terenie tej gildii!"); }
-    public String getPermsNoFriendlyFireMessage() { return getMessage("perms-no-friendly-fire", "&cNie możesz obrażać członków swojej gildii!"); }
+    // ---------- Permission messages (delegating to MessagesConfig for backward compatibility) ----------
 
-    // convenience: zwracamy Component (gotowy do wysłania metodą player.sendMessage(Component))
-    public Component getPermsNoBreakComponent() { return toComponent(getPermsNoBreakMessage()); }
-    public Component getPermsNoPlaceComponent() { return toComponent(getPermsNoPlaceMessage()); }
-    public Component getPermsNoOpenChestComponent() { return toComponent(getPermsNoOpenChestMessage()); }
-    public Component getPermsNoOpenEnderComponent() { return toComponent(getPermsNoOpenEnderMessage()); }
-    public Component getPermsNoInteractComponent() { return toComponent(getPermsNoInteractMessage()); }
-    public Component getPermsNoBucketsComponent() { return toComponent(getPermsNoBucketsMessage()); }
-    public Component getPermsNoFireComponent() { return toComponent(getPermsNoFireMessage()); }
-    public Component getPermsNoFriendlyFireComponent() { return toComponent(getPermsNoFriendlyFireMessage()); }
+    public String getPermsNoBreakMessage() { return messagesConfig.getPermsNoBreakMessage(); }
+    public String getPermsNoPlaceMessage() { return messagesConfig.getPermsNoPlaceMessage(); }
+    public String getPermsNoOpenChestMessage() { return messagesConfig.getPermsNoOpenChestMessage(); }
+    public String getPermsNoOpenEnderMessage() { return messagesConfig.getPermsNoOpenEnderMessage(); }
+    public String getPermsNoInteractMessage() { return messagesConfig.getPermsNoInteractMessage(); }
+    public String getPermsNoBucketsMessage() { return messagesConfig.getPermsNoBucketsMessage(); }
+    public String getPermsNoFireMessage() { return messagesConfig.getPermsNoFireMessage(); }
+    public String getPermsNoFriendlyFireMessage() { return messagesConfig.getPermsNoFriendlyFireMessage(); }
+
+    // Permission messages as Components
+    public Component getPermsNoBreakComponent() { return messagesConfig.getPermsNoBreakComponent(); }
+    public Component getPermsNoPlaceComponent() { return messagesConfig.getPermsNoPlaceComponent(); }
+    public Component getPermsNoOpenChestComponent() { return messagesConfig.getPermsNoOpenChestComponent(); }
+    public Component getPermsNoOpenEnderComponent() { return messagesConfig.getPermsNoOpenEnderComponent(); }
+    public Component getPermsNoInteractComponent() { return messagesConfig.getPermsNoInteractComponent(); }
+    public Component getPermsNoBucketsComponent() { return messagesConfig.getPermsNoBucketsComponent(); }
+    public Component getPermsNoFireComponent() { return messagesConfig.getPermsNoFireComponent(); }
+    public Component getPermsNoFriendlyFireComponent() { return messagesConfig.getPermsNoFriendlyFireComponent(); }
+
+    // ---------- Component utilities (delegating to MessagesConfig) ----------
 
     // Parsowanie legacy-colored string -> Component
     public Component toComponent(String text) {
-        if (text == null) return Component.empty();
-        return LEGACY.deserialize(text);
+        return messagesConfig.toComponent(text);
     }
 
     // Pobierz komunikat jako Component (z "messages." prefix)
     public Component messageAsComponent(String key) {
-        String s = getMessage(key, "");
-        return LEGACY.deserialize(s);
+        return messagesConfig.getMessageAsComponent(key);
     }
 }
