@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import pl.tenfajnybartek.funnyaddons.base.FunnyAddons;
 import pl.tenfajnybartek.funnyaddons.managers.ConfigManager;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
@@ -25,7 +26,7 @@ public class PermissionsCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) return true;
 
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(player).orNull();
@@ -38,17 +39,15 @@ public class PermissionsCommand implements CommandExecutor {
         try {
             Guild guild = user.getGuild().orNull();
             if (guild != null) {
-                // Bezpieczne sprawdzenie ownera - obsługujemy różne możliwe typy zwracane przez API
                 Object owner = null;
                 try {
-                    owner = guild.getOwner(); // może zwracać User, String, UUID w zależności od wersji API
+                    owner = guild.getOwner();
                 } catch (NoSuchMethodError | NoClassDefFoundError ignored) {
                     owner = null;
                 }
 
                 if (owner instanceof User) {
                     User ownerUser = (User) owner;
-                    // porównujemy UUID jeśli dostępne, inaczej name
                     try {
                         UUID ownerUuid = ownerUser.getUUID();
                         if (ownerUuid != null && ownerUuid.equals(player.getUniqueId())) {
@@ -57,7 +56,6 @@ public class PermissionsCommand implements CommandExecutor {
                             isLeader = true;
                         }
                     } catch (NoSuchMethodError ignored) {
-                        // fallback do porównania po nazwie
                         try {
                             if (ownerUser.getName() != null && ownerUser.getName().equalsIgnoreCase(player.getName())) {
                                 isLeader = true;
@@ -69,7 +67,6 @@ public class PermissionsCommand implements CommandExecutor {
                 } else if (owner instanceof UUID) {
                     if (((UUID) owner).equals(player.getUniqueId())) isLeader = true;
                 } else {
-                    // fallback: spróbuj porównać właściciela po polu guild.getOwnerName() jeżeli istnieje
                     try {
                         String ownerName = (String) guild.getClass().getMethod("getOwnerName").invoke(guild);
                         if (ownerName != null && ownerName.equalsIgnoreCase(player.getName())) isLeader = true;
@@ -83,8 +80,6 @@ public class PermissionsCommand implements CommandExecutor {
             return true;
         }
 
-        // Otwieramy GUI członków gildii. GuildMembersGUI oczekuje instancji pluginu w swojej sygnaturze,
-        // dlatego przekazujemy statyczny getter FunnyAddons.getPluginInstance()
         pl.tenfajnybartek.funnyaddons.permissions.GuildMembersGUI.openForPlayer(
                 player,
                 user.getGuild().orNull(),

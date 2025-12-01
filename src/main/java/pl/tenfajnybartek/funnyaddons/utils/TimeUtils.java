@@ -31,6 +31,6 @@ public class TimeUtils {
             stringBuilder.append(seconds).append("s");
         }
 
-        return stringBuilder.length() > 0 ? stringBuilder.toString().trim() : time + "ms";
+        return !stringBuilder.isEmpty() ? stringBuilder.toString().trim() : time + "ms";
     }
 }

@@ -8,10 +8,8 @@ import java.util.UUID;
 
 public class GUIContext {
 
-    // viewerUUID -> guildTag (for members list)
     private static final Map<UUID, String> membersInventory = new HashMap<>();
 
-    // viewerUUID -> (guildTag, memberUuid) for member-permissions view
     private static final Map<UUID, MemberContext> memberPermInv = new HashMap<>();
 
     public static void registerGuildMembersInventory(UUID viewer, String guildTag, PermissionsManager perms) {

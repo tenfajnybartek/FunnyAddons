@@ -10,9 +10,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import panda.std.Option;
 import pl.tenfajnybartek.funnyaddons.managers.ConfigManager;
 import pl.tenfajnybartek.funnyaddons.utils.ChatUtils;
+
+import java.util.Objects;
 
 public class BuyCoordsCommand implements CommandExecutor {
 
@@ -25,12 +28,12 @@ public class BuyCoordsCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
 
         if (!(sender instanceof Player player)) {
             String onlyPlayerMsg = config.getConfig().getString("only-player");
             if (onlyPlayerMsg != null) {
-                onlyPlayerMsg = onlyPlayerMsg.replace("{ITEM}", config.getConfig().getString("item"));
+                onlyPlayerMsg = onlyPlayerMsg.replace("{ITEM}", Objects.requireNonNull(config.getConfig().getString("item")));
                 ChatUtils.sendMessage(sender, onlyPlayerMsg);
             }
             return true;

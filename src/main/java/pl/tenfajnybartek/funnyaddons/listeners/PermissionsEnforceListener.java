@@ -60,7 +60,6 @@ public class PermissionsEnforceListener implements Listener {
         if (guild == null) return;
 
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(p).orNull();
-        // enforcement only for members of this guild
         if (!isMemberOfGuild(user, guild)) return;
 
         if (isOwner(user, guild)) return;
@@ -101,13 +100,12 @@ public class PermissionsEnforceListener implements Listener {
 
         InventoryType type = event.getInventory().getType();
 
-        // jeśli otwieranie enderchesta lub chest — enforcement tylko dla członków tej gildii
         if (type == InventoryType.ENDER_CHEST || isContainerType(type)) {
             Guild guild = getGuildAtLocation(p.getLocation());
             if (guild == null) return;
 
             User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(p).orNull();
-            if (!isMemberOfGuild(user, guild)) return; // only members are enforced
+            if (!isMemberOfGuild(user, guild)) return;
 
             if (isOwner(user, guild)) return;
 
@@ -136,11 +134,10 @@ public class PermissionsEnforceListener implements Listener {
         if (guild == null) return;
 
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(p).orNull();
-        if (!isMemberOfGuild(user, guild)) return; // enforcement only for members
+        if (!isMemberOfGuild(user, guild)) return;
 
         if (isOwner(user, guild)) return;
 
-        // Interact with interactable block (button/lever/door)
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
             Block clicked = event.getClickedBlock();
             if (clicked != null && isInteractableBlock(clicked)) {
@@ -153,7 +150,6 @@ public class PermissionsEnforceListener implements Listener {
             }
         }
 
-        // Use flint and steel / ignite
         if (event.getItem() != null && event.getItem().getType() == Material.FLINT_AND_STEEL) {
             boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.USE_FIRE);
             if (!allowed) {
@@ -190,9 +186,7 @@ public class PermissionsEnforceListener implements Listener {
 
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(p).orNull();
         if (!isMemberOfGuild(user, guild)) return;
-
         if (isOwner(user, guild)) return;
-
         boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.USE_BUCKETS);
         if (!allowed) {
             event.setCancelled(true);
@@ -202,7 +196,6 @@ public class PermissionsEnforceListener implements Listener {
 
     @EventHandler
     public void onPvp(EntityDamageByEntityEvent event) {
-        // Friendly fire: attacker and victim are in the SAME guild -> check FRIENDLY_FIRE flag
         if (event.getDamager() instanceof Player dam && event.getEntity() instanceof Player vic) {
             User damUser = FunnyGuilds.getInstance().getUserManager().findByPlayer(dam).orNull();
             User vicUser = FunnyGuilds.getInstance().getUserManager().findByPlayer(vic).orNull();
@@ -211,7 +204,6 @@ public class PermissionsEnforceListener implements Listener {
             var damGuild = damUser.getGuild().orNull();
             var vicGuild = vicUser.getGuild().orNull();
             if (damGuild != null && vicGuild != null && damGuild.equals(vicGuild)) {
-                // in same guild -> allow only if FRIENDLY_FIRE is granted
                 boolean allowed = perms.hasPermission(damGuild.getTag(), dam.getUniqueId(), PermissionType.FRIENDLY_FIRE);
                 if (!allowed) {
                     event.setCancelled(true);
@@ -232,48 +224,26 @@ public class PermissionsEnforceListener implements Listener {
     }
 
     private boolean isContainerType(InventoryType type) {
-        switch (type) {
-            case CHEST:
-            case ENDER_CHEST:
-            case HOPPER:
-            case DROPPER:
-            case DISPENSER:
-            case FURNACE:
-            case BARREL:
-            case BLAST_FURNACE:
-            case SMOKER:
-            case SHULKER_BOX:
-            case WORKBENCH:
-                return true;
-            default:
-                return false;
-        }
+        return switch (type) {
+            case CHEST, ENDER_CHEST, HOPPER, DROPPER, DISPENSER, FURNACE, BARREL, BLAST_FURNACE, SMOKER, SHULKER_BOX,
+                 WORKBENCH -> true;
+            default -> false;
+        };
     }
 
-    /**
-     * Zastępuje przestarzałe isInteractable() — sprawdza BlockData (Openable / Switch)
-     * i jako fallback porównuje końcówki nazwy materiału (BUTTON/DOOR/TRAPDOOR/FENCE_GATE).
-     */
     private boolean isInteractableBlock(Block block) {
         if (block == null) return false;
 
         BlockData data = block.getBlockData();
-        // drzwi / trapdoor / fence_gate / chest itp. które implementują Openable
         if (data instanceof Openable) {
             return true;
         }
 
-        // przyciski / dźwignie implementują typ Switch
         if (data instanceof Switch) {
             return true;
         }
 
-        // fallback po nazwie materiału (np. OAK_BUTTON, IRON_DOOR, ACACIA_TRAPDOOR)
         String name = block.getType().name();
-        if (name.endsWith("_BUTTON") || name.endsWith("_DOOR") || name.endsWith("_TRAPDOOR") || name.endsWith("_FENCE_GATE") || name.equals("LEVER")) {
-            return true;
-        }
-
-        return false;
+        return name.endsWith("_BUTTON") || name.endsWith("_DOOR") || name.endsWith("_TRAPDOOR") || name.endsWith("_FENCE_GATE") || name.equals("LEVER");
     }
 }

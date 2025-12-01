@@ -8,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import pl.tenfajnybartek.funnyaddons.base.FunnyAddons;
 import pl.tenfajnybartek.funnyaddons.managers.ConfigManager;
 import pl.tenfajnybartek.funnyaddons.utils.ChatUtils;
@@ -15,6 +16,7 @@ import pl.tenfajnybartek.funnyaddons.utils.LocationUtils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class FreeSpaceCommand implements CommandExecutor {
 
@@ -24,11 +26,11 @@ public class FreeSpaceCommand implements CommandExecutor {
     public FreeSpaceCommand(FunnyAddons addon) {
         this.addon = addon;
         this.config = addon.getConfigManager();
-        addon.getCommand("wolnemiejsce").setExecutor(this);
+        Objects.requireNonNull(addon.getCommand("wolnemiejsce")).setExecutor(this);
     }
 
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, String[] strings) {
         if (!(commandSender instanceof Player player)) return true;
 
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(player).orNull();

@@ -1,8 +1,6 @@
 package pl.tenfajnybartek.funnyaddons.utils;
 
-import org.apache.commons.lang3.Validate;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
@@ -20,7 +18,6 @@ public final class RandomUtils {
             min = max;
             max = tmp;
         }
-        // ThreadLocalRandom.nextInt(origin, bound) is exclusive for bound, so +1 to include max
         return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
 }

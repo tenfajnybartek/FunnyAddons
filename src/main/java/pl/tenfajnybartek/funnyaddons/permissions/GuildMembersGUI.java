@@ -40,7 +40,6 @@ public class GuildMembersGUI {
             User u = list.get(i);
             UUID uuid;
             try {
-                // handle różne sygnatury API User
                 uuid = (UUID) u.getClass().getMethod("getUniqueId").invoke(u);
             } catch (Exception ex) {
                 try { uuid = u.getUUID(); } catch (Throwable t) { uuid = null; }

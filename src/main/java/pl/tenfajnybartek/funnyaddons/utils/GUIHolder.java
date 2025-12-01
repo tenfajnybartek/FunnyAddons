@@ -33,6 +33,6 @@ public class GUIHolder implements InventoryHolder {
 
     @Override
     public Inventory getInventory() {
-        return null; // zwykle nie używamy; Bukkit ustawi inventory w samym obiekcie
+        return null;
     }
 }

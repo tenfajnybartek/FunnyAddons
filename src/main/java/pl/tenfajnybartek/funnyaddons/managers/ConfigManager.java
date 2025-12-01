@@ -1,5 +1,8 @@
 package pl.tenfajnybartek.funnyaddons.managers;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -7,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ConfigManager {
@@ -14,36 +18,25 @@ public class ConfigManager {
     private final JavaPlugin plugin;
     private FileConfiguration cfg;
     private final File configFile;
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
 
     public ConfigManager(JavaPlugin plugin) {
         this.plugin = plugin;
         plugin.saveDefaultConfig();
         this.configFile = new File(plugin.getDataFolder(), "config.yml");
-        this.cfg = plugin.getConfig();
+        this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
     }
 
-    /**
-     * Zwraca obiekt FileConfiguration (aktualny konfig).
-     */
     public FileConfiguration getConfig() {
         return cfg;
     }
 
-    /**
-     * Bezpieczne pobranie wiadomości.
-     * Jeżeli podasz klucz "key" to najpierw próbuje "messages.key", potem "key".
-     * Jeśli nic nie znajdzie zwraca pusty string.
-     */
     public String getMessage(String key) {
         return getMessage(key, "");
     }
 
-    /**
-     * Jak wyżej, ale z wartością domyślną.
-     */
     public String getMessage(String key, String defaultValue) {
         if (key == null) return defaultValue;
-        // Jeżeli użytkownik podał już pełny path "messages.xxx" - używamy bez zmian
         String val;
         if (key.startsWith("messages.")) {
             val = cfg.getString(key, defaultValue);
@@ -54,12 +47,8 @@ public class ConfigManager {
         return val != null ? val : defaultValue;
     }
 
-    /**
-     * Przeładowanie configu z dysku.
-     */
     public void reload() {
         plugin.reloadConfig();
-        // ponownie wczytaj do lokalnego pola (dla bezpieczeństwa)
         this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
     }
 
@@ -67,7 +56,6 @@ public class ConfigManager {
         return plugin;
     }
 
-    // ---------- Convenience getters dla często używanych wiadomości ----------
     public String getInGuildMessage() {
         return getMessage("in-guild-message", "&cNie możesz użyć tej komendy, będąc w gildii!");
     }
@@ -85,13 +73,11 @@ public class ConfigManager {
     }
 
     public String getLocationListMessage() {
-        // zachowujemy zgodność z poprzednimi nazwami kluczy
         String v = getMessage("location-list-message", "");
         if (v.isEmpty()) v = getMessage("locationList", "x: {X}, z: {Z} - odleglosc {DISTANCE} metrow.");
         return v;
     }
 
-    // ---------- Pozostałe getters (Twoje dotychczasowe) ----------
     public int getMinBound() {
         return getConfig().getInt("bound.min");
     }
@@ -171,5 +157,52 @@ public class ConfigManager {
             this.color = color;
             this.style = style;
         }
+    }
+
+    public int getMemberPermissionsSize() {
+        return getConfig().getInt("permissions.gui.member-permissions-size", 27);
+    }
+
+    public int getTitleMaxLength() {
+        return getConfig().getInt("permissions.gui.title-max-length", 32);
+    }
+
+    public Material getIcon(String key, Material fallback) {
+        String path = "permissions.icons." + key;
+        String mat = getConfig().getString(path, null);
+        if (mat == null || mat.isBlank()) return fallback;
+        Material m = Material.matchMaterial(mat);
+        return m != null ? m : fallback;
+    }
+
+    public List<String> getDefaultPerms(String role) {
+        return getConfig().getStringList("permissions.defaults." + role);
+    }
+
+    public boolean isRelationEnabled() {
+        return getConfig().getBoolean("permissions.relation.enable", false);
+    }
+
+    public String getRelationDefaultBehavior() {
+        return getConfig().getString("permissions.relation.default-behavior", "follow_fg");
+    }
+
+    public String getPermsNoBreakMessage() { return getMessage("perms-no-break", "&cNie masz uprawnień do niszczenia na terenie tej gildii!"); }
+    public String getPermsNoPlaceMessage() { return getMessage("perms-no-place", "&cNie masz uprawnień do stawiania bloków na terenie tej gildii!"); }
+    public String getPermsNoOpenChestMessage() { return getMessage("perms-no-open-chest", "&cNie masz uprawnień do otwierania skrzyń na terenie tej gildii!"); }
+    public String getPermsNoOpenEnderMessage() { return getMessage("perms-no-open-ender", "&cNie masz uprawnień do otwierania ender chesta na terenie tej gildii!"); }
+    public String getPermsNoInteractMessage() { return getMessage("perms-no-interact", "&cNie masz uprawnień do używania przycisków/dźwigni/drzwi na terenie tej gildii!"); }
+    public String getPermsNoBucketsMessage() { return getMessage("perms-no-buckets", "&cNie masz uprawnień do używania kubełków na terenie tej gildii!"); }
+    public String getPermsNoFireMessage() { return getMessage("perms-no-fire", "&cNie masz uprawnień do używania flinta i stali (odpalenie) na terenie tej gildii!"); }
+    public String getPermsNoFriendlyFireMessage() { return getMessage("perms-no-friendly-fire", "&cNie możesz obrażać członków swojej gildii!"); }
+
+    public Component toComponent(String text) {
+        if (text == null) return Component.empty();
+        return LEGACY.deserialize(text);
+    }
+
+    public Component messageAsComponent(String key) {
+        String s = getMessage(key, "");
+        return LEGACY.deserialize(s);
     }
 }

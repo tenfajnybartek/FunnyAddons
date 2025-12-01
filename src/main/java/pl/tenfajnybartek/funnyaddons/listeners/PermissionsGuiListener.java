@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import pl.tenfajnybartek.funnyaddons.base.FunnyAddons;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
 import pl.tenfajnybartek.funnyaddons.permissions.MemberPermissionsGUI;
 import pl.tenfajnybartek.funnyaddons.utils.GUIContext;
@@ -20,9 +21,11 @@ import java.util.UUID;
 public class PermissionsGuiListener implements Listener {
 
     private final PermissionsManager perms;
+    private final FunnyAddons plugin;
 
-    public PermissionsGuiListener(PermissionsManager perms) {
+    public PermissionsGuiListener(PermissionsManager perms, FunnyAddons plugin) {
         this.perms = perms;
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -41,7 +44,6 @@ public class PermissionsGuiListener implements Listener {
 
         Component titleComp = event.getView().title();
         String title = PlainTextComponentSerializer.plainText().serialize(titleComp);
-
         if (title.startsWith("Gildia: ")) {
             ItemStack clicked = event.getCurrentItem();
             if (clicked == null || !clicked.hasItemMeta()) return;
@@ -58,7 +60,7 @@ public class PermissionsGuiListener implements Listener {
             String guildTag = GUIContext.getGuildTagForMembersInv(viewerId);
             if (guildTag == null) return;
 
-            MemberPermissionsGUI.open(viewer, memberUuid, guildTag, perms);
+            MemberPermissionsGUI.open(viewer, memberUuid, guildTag, perms, plugin);
             GUIContext.unregisterMembersInventory(viewerId);
             return;
         }
@@ -85,13 +87,21 @@ public class PermissionsGuiListener implements Listener {
                 perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.BREAK);
             } else if (display.contains("PLACE")) {
                 perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.PLACE);
+            } else if (display.contains("INTERACT_BLOCK")) {
+                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.INTERACT_BLOCK);
             } else if (display.contains("OPEN_CHEST")) {
                 perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.OPEN_CHEST);
-            } else if (display.contains("PVP")) {
-                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.PVP);
+            } else if (display.contains("OPEN_ENDER_CHEST")) {
+                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.OPEN_ENDER_CHEST);
+            } else if (display.contains("USE_BUCKETS")) {
+                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.USE_BUCKETS);
+            } else if (display.contains("USE_FIRE")) {
+                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.USE_FIRE);
+            } else if (display.contains("FRIENDLY_FIRE")) {
+                perms.togglePermission(ctx.guildTag, ctx.member, PermissionType.FRIENDLY_FIRE);
             }
-
-            MemberPermissionsGUI.open(viewer, ctx.member, ctx.guildTag, perms);
+            
+            MemberPermissionsGUI.open(viewer, ctx.member, ctx.guildTag, perms, plugin);
         }
     }
 

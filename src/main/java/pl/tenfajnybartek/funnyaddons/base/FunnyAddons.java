@@ -56,11 +56,9 @@ public final class FunnyAddons extends JavaPlugin {
     }
 
     private void initPermissions() {
-        // inicjalizujemy manager uprawnień i rejestrujemy listenery związane z GUI/egzekwowaniem uprawnień
         permissionsManager = new PermissionsManager(this);
 
-        // rejestrujemy listener obsługujący GUI kliknięcia i listener egzekwujący uprawnienia
-        getServer().getPluginManager().registerEvents(new PermissionsGuiListener(permissionsManager), this);
+        getServer().getPluginManager().registerEvents(new PermissionsGuiListener(permissionsManager, this), this);
         getServer().getPluginManager().registerEvents(new PermissionsEnforceListener(permissionsManager), this);
     }
 
@@ -87,8 +85,7 @@ public final class FunnyAddons extends JavaPlugin {
         Objects.requireNonNull(getCommand("wolnemiejsce")).setExecutor(new FreeSpaceCommand(this));
         Objects.requireNonNull(getCommand("kupkordy")).setExecutor(new BuyCoordsCommand(configManager, guildManager));
         Objects.requireNonNull(getCommand("fgaddonsreload")).setExecutor(new ReloadConfigCommand(configManager));
-        // PermissionsCommand wymaga instancji pluginu i permissionsManager - upewnij się, że permissionsManager został zainicjalizowany
-        Objects.requireNonNull(getCommand("uprawnienia")).setExecutor(new PermissionsCommand(configManager, permissionsManager));
+        Objects.requireNonNull(getCommand("uprawnienia")).setExecutor(new PermissionsCommand(this.getConfigManager(), permissionsManager));
         logInfo("Komendy zarejestrowane.");
     }
 
@@ -97,7 +94,7 @@ public final class FunnyAddons extends JavaPlugin {
                 this,
                 new GenerateCoordinatesTask(this),
                 0L,
-                configManager.getGenerationDelay() * 20L // delay w sekundach
+                configManager.getGenerationDelay() * 20L
         );
     }
 
@@ -150,7 +147,6 @@ public final class FunnyAddons extends JavaPlugin {
         return configManager;
     }
 
-    // statyczny getter przydatny w innych helperach (ViewerUtils itp.)
     public static FunnyAddons getPluginInstance() {
         return instance;
     }
