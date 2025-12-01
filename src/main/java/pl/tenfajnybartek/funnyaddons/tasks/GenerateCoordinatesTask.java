@@ -22,8 +22,8 @@ public class GenerateCoordinatesTask implements Runnable {
 
     @Override
     public void run() {
-        int x = RandomUtils.getRandomInt(config.getMinBound(), config.getMaxBound());
-        int z = RandomUtils.getRandomInt(config.getMinBound(), config.getMaxBound());
+        int x = RandomUtils.getRandomInt(config.getMinBound(), config.getMaxBound(), addon.getLogger());
+        int z = RandomUtils.getRandomInt(config.getMinBound(), config.getMaxBound(), addon.getLogger());
 
         Location location = new Location(Bukkit.getWorlds().get(0), x, 128, z);
 

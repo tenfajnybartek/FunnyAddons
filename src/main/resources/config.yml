@@ -1,4 +1,7 @@
+
   # FunnyAddons - config.yml
+  # Upewnij się, że ten plik umieszczony jest w src/main/resources/config.yml
+  # lub w folderze pluginu (po pierwszym uruchomieniu plugin.saveDefaultConfig() utworzy plik w folderze wtyczki).
 
   #### KUPOWANIE KORDÓW ZA ITEMY: ###
   # Nazwa przedmiotu, wymaganego do zakupu kordów.
@@ -88,7 +91,6 @@
 
   # ---------------------------
   # SCALONA SEKCJA 'messages'
-  # Używaj configManager.getMessage("klucz") lub convenience getterów w ConfigManager
   # ---------------------------
   messages:
     # ogólne / komunikaty
@@ -120,20 +122,18 @@
   # ---------------------------
   permissions:
     gui:
-      members-title: "Gildia: {GUILD} - członkowie"         # tytuł inventory z listą członków
-      member-perms-title: "Uprawnienia: {GUILD} - {NAME}"  # tytuł inventory z uprawnieniami danego gracza
-      size-row: 1                                         # ile wierszy GUI na listę (1 = 9 slotów)
+      members-title: "Gildia: {GUILD} - członkowie"
+      member-perms-title: "Uprawnienia: {GUILD} - {NAME}"
+      size-row: 1
 
     icons:
-      break: DIAMOND_PICKAXE    # materiał wyświetlany dla opcji BREAK
-      place: OAK_PLANKS         # materiał dla PLACE
-      open_chest: CHEST         # materiał dla OPEN_CHEST
-      pvp: IRON_SWORD           # materiał dla PVP
-      back: BARRIER             # materiał dla przycisku powrotu
+      break: DIAMOND_PICKAXE
+      place: OAK_PLANKS
+      open_chest: CHEST
+      pvp: IRON_SWORD
+      back: BARRIER
 
     defaults:
-      # Domyślne uprawnienia nadawane członkom nowo tworzonej gildii (opcjonalne).
-      # Nazwy zgadzają się z PermissionType (BREAK, PLACE, OPEN_CHEST, PVP)
       member: []
       officer:
         - BREAK
@@ -144,4 +144,3 @@
         - PLACE
         - OPEN_CHEST
         - PVP
-    ```
