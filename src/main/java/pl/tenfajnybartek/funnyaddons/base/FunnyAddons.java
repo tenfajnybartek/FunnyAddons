@@ -159,11 +159,6 @@ public final class FunnyAddons extends JavaPlugin {
         return configManager;
     }
 
-    /**
-     * Gets the PermissionsManager instance for guild permission operations.
-     *
-     * @return The PermissionsManager instance
-     */
     public PermissionsManager getPermissionsManager() {
         return permissionsManager;
     }

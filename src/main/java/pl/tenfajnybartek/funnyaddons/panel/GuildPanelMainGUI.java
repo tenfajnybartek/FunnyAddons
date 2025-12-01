@@ -9,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import pl.tenfajnybartek.funnyaddons.base.FunnyAddons;
 import pl.tenfajnybartek.funnyaddons.config.PanelConfig;
 import pl.tenfajnybartek.funnyaddons.utils.ChatUtils;
@@ -26,20 +25,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Main guild panel GUI.
- * <p>
- * Displays options for territory enlargement, guild info, validity renewal,
- * effects purchase, and member permissions management.
- */
 public class GuildPanelMainGUI {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
             .withZone(ZoneId.systemDefault());
 
-    /**
-     * Opens the main panel GUI for the specified player.
-     */
     public static void open(Player player, Guild guild, FunnyAddons plugin) {
         PanelConfig cfg = plugin.getConfigManager().getPanelConfig();
 
@@ -49,7 +39,6 @@ public class GuildPanelMainGUI {
         GUIHolder holder = new GUIHolder(GUIHolder.Kind.GUILD_PANEL_MAIN, guild.getTag(), null);
         Inventory inv = Bukkit.createInventory(holder, size, ChatUtils.toComponent(title));
 
-        // Get guild data for placeholders
         String tag = guild.getTag();
         String name = guild.getName();
         GuildRank rank = guild.getRank();
@@ -64,32 +53,26 @@ public class GuildPanelMainGUI {
         String renewDuration = formatDuration(cfg.getRenewDurationSeconds());
         String renewCost = formatCost(cfg.getRenewCost());
 
-        // Territory item
         inv.setItem(cfg.getMainItemSlot("territory"),
                 createItem(cfg, "territory", tag, name, points, kills, leader, vice, members,
                         terrainLevel, bounds, expires, renewDuration, renewCost));
 
-        // Info item
         inv.setItem(cfg.getMainItemSlot("info"),
                 createItem(cfg, "info", tag, name, points, kills, leader, vice, members,
                         terrainLevel, bounds, expires, renewDuration, renewCost));
 
-        // Renew item
         inv.setItem(cfg.getMainItemSlot("renew"),
                 createItem(cfg, "renew", tag, name, points, kills, leader, vice, members,
                         terrainLevel, bounds, expires, renewDuration, renewCost));
 
-        // Effects item
         inv.setItem(cfg.getMainItemSlot("effects"),
                 createItem(cfg, "effects", tag, name, points, kills, leader, vice, members,
                         terrainLevel, bounds, expires, renewDuration, renewCost));
 
-        // Permissions item
         inv.setItem(cfg.getMainItemSlot("permissions"),
                 createItem(cfg, "permissions", tag, name, points, kills, leader, vice, members,
                         terrainLevel, bounds, expires, renewDuration, renewCost));
 
-        // Close item
         inv.setItem(cfg.getMainItemSlot("close"),
                 createItem(cfg, "close", tag, name, points, kills, leader, vice, members,
                         terrainLevel, bounds, expires, renewDuration, renewCost));
@@ -146,10 +129,6 @@ public class GuildPanelMainGUI {
                 .map(User::getName)
                 .collect(Collectors.joining(", "));
     }
-
-    /**
-     * Gets the current terrain level based on the guild's region size.
-     */
     public static int getCurrentTerrainLevel(Guild guild, PanelConfig cfg) {
         int currentSize = getCurrentBounds(guild, cfg);
         Map<Integer, PanelConfig.TerritoryLevel> levels = cfg.getTerritoryLevels();
@@ -163,9 +142,6 @@ public class GuildPanelMainGUI {
         return currentLevel;
     }
 
-    /**
-     * Gets the current bounds (size) of the guild's region.
-     */
     public static int getCurrentBounds(Guild guild, PanelConfig cfg) {
         try {
             Region region = guild.getRegion().orNull();
@@ -175,7 +151,6 @@ public class GuildPanelMainGUI {
         } catch (Exception ignored) {
         }
 
-        // Default to first level bounds
         Map<Integer, PanelConfig.TerritoryLevel> levels = cfg.getTerritoryLevels();
         if (!levels.isEmpty()) {
             return levels.values().iterator().next().getBounds();
@@ -211,7 +186,6 @@ public class GuildPanelMainGUI {
 
     private static String formatMaterialName(Material mat) {
         String name = mat.name().toLowerCase().replace("_", " ");
-        // Capitalize each word
         String[] words = name.split(" ");
         StringBuilder sb = new StringBuilder();
         for (String word : words) {

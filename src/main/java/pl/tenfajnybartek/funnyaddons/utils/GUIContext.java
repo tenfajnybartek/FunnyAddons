@@ -12,7 +12,6 @@ public class GUIContext {
 
     private static final Map<UUID, MemberContext> memberPermInv = new HashMap<>();
 
-    // Panel GUI contexts
     private static final Map<UUID, PanelContext> panelMainInv = new HashMap<>();
     private static final Map<UUID, PanelContext> panelTerritoryInv = new HashMap<>();
     private static final Map<UUID, PanelContext> panelEffectsInv = new HashMap<>();
@@ -41,7 +40,6 @@ public class GUIContext {
         memberPermInv.remove(viewer);
     }
 
-    // ==================== Panel GUI Context Methods ====================
 
     public static void registerPanelMainInventory(UUID viewer, String guildTag) {
         panelMainInv.put(viewer, new PanelContext(guildTag));
@@ -79,16 +77,12 @@ public class GUIContext {
         panelEffectsInv.remove(viewer);
     }
 
-    /**
-     * Unregisters all panel-related inventories for a viewer.
-     */
     public static void unregisterAllPanelInventories(UUID viewer) {
         panelMainInv.remove(viewer);
         panelTerritoryInv.remove(viewer);
         panelEffectsInv.remove(viewer);
     }
 
-    // ==================== Inner Classes ====================
 
     public static class MemberContext {
         public final String guildTag;
@@ -100,9 +94,6 @@ public class GUIContext {
         }
     }
 
-    /**
-     * Context for panel GUI operations.
-     */
     public static class PanelContext {
         public final String guildTag;
 

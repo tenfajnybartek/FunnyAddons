@@ -25,15 +25,6 @@ public class ChatUtils {
         return Pattern.matches("-?[0-9]+", str);
     }
 
-    /**
-     * Creates an ItemStack with the specified material, display name, and lore.
-     * Uses Adventure API and legacy color codes (&).
-     *
-     * @param material The material for the item
-     * @param name     The display name (supports & color codes)
-     * @param lore     The lore lines (supports & color codes), can be null or empty
-     * @return The created ItemStack with configured metadata
-     */
     public static ItemStack makeItem(Material material, String name, List<String> lore) {
         ItemStack item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
@@ -49,25 +40,10 @@ public class ChatUtils {
         return item;
     }
 
-    /**
-     * Creates an ItemStack with the specified material, display name, and single lore line.
-     *
-     * @param material The material for the item
-     * @param name     The display name (supports & color codes)
-     * @param lore     A single lore line (supports & color codes), can be null
-     * @return The created ItemStack with configured metadata
-     */
     public static ItemStack makeItem(Material material, String name, String lore) {
         return makeItem(material, name, lore != null ? Collections.singletonList(lore) : null);
     }
 
-    /**
-     * Creates an ItemStack with the specified material and display name (no lore).
-     *
-     * @param material The material for the item
-     * @param name     The display name (supports & color codes)
-     * @return The created ItemStack with configured metadata
-     */
     public static ItemStack makeItem(Material material, String name) {
         return makeItem(material, name, (String) null);
     }

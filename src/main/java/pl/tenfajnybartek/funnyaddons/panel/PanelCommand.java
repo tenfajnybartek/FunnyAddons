@@ -31,20 +31,17 @@ public class PanelCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        // Only players can use this command
         if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatUtils.toComponent(panelConfig.getOnlyPlayerMessage()));
             return true;
         }
 
-        // Check if player is in a guild
         User user = FunnyGuilds.getInstance().getUserManager().findByPlayer(player).orNull();
         if (user == null || !user.hasGuild()) {
             ChatUtils.sendMessage(player, panelConfig.getNotInGuildMessage());
             return true;
         }
 
-        // Check if player is the guild leader
         Guild guild = user.getGuild().orNull();
         if (guild == null) {
             ChatUtils.sendMessage(player, panelConfig.getNotInGuildMessage());
@@ -57,16 +54,11 @@ public class PanelCommand implements CommandExecutor {
             return true;
         }
 
-        // Open the main panel GUI
         GuildPanelMainGUI.open(player, guild, plugin);
 
         return true;
     }
 
-    /**
-     * Checks if the player is the leader of the guild.
-     * Uses multiple methods for compatibility with different FunnyGuilds versions.
-     */
     private boolean isPlayerLeader(Player player, Guild guild) {
         try {
             Object owner = null;
@@ -97,7 +89,6 @@ public class PanelCommand implements CommandExecutor {
             } else if (owner instanceof UUID) {
                 return ((UUID) owner).equals(player.getUniqueId());
             } else {
-                // Try reflection as last resort
                 try {
                     String ownerName = (String) guild.getClass().getMethod("getOwnerName").invoke(guild);
                     if (ownerName != null && ownerName.equalsIgnoreCase(player.getName())) {

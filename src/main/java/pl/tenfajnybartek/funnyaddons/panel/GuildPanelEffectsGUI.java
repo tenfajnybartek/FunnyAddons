@@ -20,16 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Guild effects purchase GUI.
- * <p>
- * Allows leaders to purchase potion effects for all online guild members.
- */
 public class GuildPanelEffectsGUI {
 
-    /**
-     * Opens the effects panel GUI for the specified player.
-     */
     public static void open(Player player, Guild guild, FunnyAddons plugin) {
         PanelConfig cfg = plugin.getConfigManager().getPanelConfig();
 
@@ -39,14 +31,12 @@ public class GuildPanelEffectsGUI {
         GUIHolder holder = new GUIHolder(GUIHolder.Kind.GUILD_PANEL_EFFECTS, guild.getTag(), null);
         Inventory inv = Bukkit.createInventory(holder, size, ChatUtils.toComponent(title));
 
-        // Add effect items
         Map<String, PanelConfig.EffectOption> effects = cfg.getEffectOptions();
         for (Map.Entry<String, PanelConfig.EffectOption> entry : effects.entrySet()) {
             PanelConfig.EffectOption effect = entry.getValue();
             inv.setItem(effect.getSlot(), createEffectItem(effect));
         }
 
-        // Back button
         inv.setItem(cfg.getEffectsBackSlot(),
                 ChatUtils.makeItem(cfg.getEffectsBackMaterial(),
                         cfg.getEffectsBackName(),
@@ -114,11 +104,6 @@ public class GuildPanelEffectsGUI {
         }
     }
 
-    /**
-     * Gets the effect key from the clicked slot.
-     *
-     * @return The effect key or null if not an effect slot
-     */
     public static String getEffectKeyFromSlot(int slot, PanelConfig cfg) {
         Map<String, PanelConfig.EffectOption> effects = cfg.getEffectOptions();
         for (Map.Entry<String, PanelConfig.EffectOption> entry : effects.entrySet()) {
@@ -129,22 +114,15 @@ public class GuildPanelEffectsGUI {
         return null;
     }
 
-    /**
-     * Attempts to purchase an effect for the guild.
-     *
-     * @return true if purchase was successful
-     */
     public static boolean purchaseEffect(Player player, Guild guild, String effectKey, FunnyAddons plugin) {
         PanelConfig cfg = plugin.getConfigManager().getPanelConfig();
         Map<String, PanelConfig.EffectOption> effects = cfg.getEffectOptions();
 
-        // Check if effect exists
         PanelConfig.EffectOption effect = effects.get(effectKey);
         if (effect == null) {
             return false;
         }
 
-        // Check if player has required items
         Map<Material, Integer> cost = effect.getCost();
         if (!hasRequiredItems(player, cost)) {
             String costStr = formatCost(cost);
@@ -152,10 +130,8 @@ public class GuildPanelEffectsGUI {
             return false;
         }
 
-        // Remove items from player
         removeItems(player, cost);
 
-        // Apply effect to all online guild members
         PotionEffect potionEffect = new PotionEffect(
                 effect.getEffectType(),
                 effect.getDurationTicks(),
@@ -174,18 +150,15 @@ public class GuildPanelEffectsGUI {
                 if (memberPlayer != null && memberPlayer.isOnline()) {
                     memberPlayer.addPotionEffect(potionEffect);
 
-                    // Notify member (except the leader who bought it)
                     if (!memberPlayer.equals(player)) {
                         ChatUtils.sendMessage(memberPlayer,
                                 cfg.getEffectAppliedMessage().replace("{EFFECT}", effectName));
                     }
                 }
             } catch (Exception ignored) {
-                // Skip if we can't apply effect to this member
             }
         }
 
-        // Send success message to leader
         ChatUtils.sendMessage(player,
                 cfg.getEffectPurchasedMessage().replace("{EFFECT}", effectName));
 

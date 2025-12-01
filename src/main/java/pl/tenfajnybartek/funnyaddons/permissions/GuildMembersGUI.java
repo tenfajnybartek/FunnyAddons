@@ -34,9 +34,8 @@ public class GuildMembersGUI {
         List<User> list = new ArrayList<>(members);
 
         int size = ((list.size() - 1) / 9 + 1) * 9;
-        if (size == 0) size = 9;
+        if (size == 0) size = 27;
 
-        // Use config-driven title with placeholder replacement
         String rawTitle = permCfg.getMembersTitle()
                 .replace("{GUILD}", guild.getTag());
         int titleMax = permCfg.getTitleMaxLength();
@@ -47,7 +46,6 @@ public class GuildMembersGUI {
         GUIHolder holder = new GUIHolder(GUIHolder.Kind.MEMBERS_LIST, guild.getTag(), null);
         Inventory inv = Bukkit.createInventory(holder, size, ChatUtils.toComponent(rawTitle));
 
-        // Use config-driven lore for member heads
         String infoLore = permCfg.getInfoLore();
 
         for (int i = 0; i < list.size(); i++) {

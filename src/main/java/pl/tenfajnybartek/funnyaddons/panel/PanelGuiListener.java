@@ -20,9 +20,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Listener for all panel GUI click and close events.
- */
 public class PanelGuiListener implements Listener {
 
     private final FunnyAddons plugin;
@@ -39,7 +36,6 @@ public class PanelGuiListener implements Listener {
 
         UUID viewerId = player.getUniqueId();
 
-        // Check which panel inventory the player has open
         GUIContext.PanelContext mainCtx = GUIContext.getPanelMainContext(viewerId);
         GUIContext.PanelContext territoryCtx = GUIContext.getPanelTerritoryContext(viewerId);
         GUIContext.PanelContext effectsCtx = GUIContext.getPanelEffectsContext(viewerId);
@@ -64,42 +60,35 @@ public class PanelGuiListener implements Listener {
         Guild guild = getGuildByTag(ctx.guildTag);
         if (guild == null) return;
 
-        // Territory button
         if (slot == panelConfig.getMainItemSlot("territory")) {
             GUIContext.unregisterPanelMainInventory(player.getUniqueId());
             GuildPanelTerritoryGUI.open(player, guild, plugin);
             return;
         }
 
-        // Info button - does nothing, just informational
         if (slot == panelConfig.getMainItemSlot("info")) {
             return;
         }
 
-        // Renew button
         if (slot == panelConfig.getMainItemSlot("renew")) {
             handleRenewValidity(player, guild);
-            // Refresh the GUI to show updated validity
             GUIContext.unregisterPanelMainInventory(player.getUniqueId());
             GuildPanelMainGUI.open(player, guild, plugin);
             return;
         }
 
-        // Effects button
         if (slot == panelConfig.getMainItemSlot("effects")) {
             GUIContext.unregisterPanelMainInventory(player.getUniqueId());
             GuildPanelEffectsGUI.open(player, guild, plugin);
             return;
         }
 
-        // Permissions button
         if (slot == panelConfig.getMainItemSlot("permissions")) {
             GUIContext.unregisterPanelMainInventory(player.getUniqueId());
             GuildMembersGUI.openForPlayer(player, guild, plugin, plugin.getPermissionsManager());
             return;
         }
 
-        // Close button
         if (slot == panelConfig.getMainItemSlot("close")) {
             player.closeInventory();
             return;
@@ -114,18 +103,15 @@ public class PanelGuiListener implements Listener {
         Guild guild = getGuildByTag(ctx.guildTag);
         if (guild == null) return;
 
-        // Back button
         if (slot == panelConfig.getTerritoryBackSlot()) {
             GUIContext.unregisterPanelTerritoryInventory(player.getUniqueId());
             GuildPanelMainGUI.open(player, guild, plugin);
             return;
         }
 
-        // Check if clicked on a level
         int level = GuildPanelTerritoryGUI.getLevelFromSlot(slot, panelConfig);
         if (level > 0) {
             boolean success = GuildPanelTerritoryGUI.upgradeTerritory(player, guild, level, plugin);
-            // Refresh the GUI regardless of success
             GUIContext.unregisterPanelTerritoryInventory(player.getUniqueId());
             GuildPanelTerritoryGUI.open(player, guild, plugin);
         }
@@ -139,35 +125,29 @@ public class PanelGuiListener implements Listener {
         Guild guild = getGuildByTag(ctx.guildTag);
         if (guild == null) return;
 
-        // Back button
         if (slot == panelConfig.getEffectsBackSlot()) {
             GUIContext.unregisterPanelEffectsInventory(player.getUniqueId());
             GuildPanelMainGUI.open(player, guild, plugin);
             return;
         }
 
-        // Check if clicked on an effect
         String effectKey = GuildPanelEffectsGUI.getEffectKeyFromSlot(slot, panelConfig);
         if (effectKey != null) {
             GuildPanelEffectsGUI.purchaseEffect(player, guild, effectKey, plugin);
-            // Keep the GUI open so player can buy more effects
         }
     }
 
     private void handleRenewValidity(Player player, Guild guild) {
         Map<Material, Integer> cost = panelConfig.getRenewCost();
 
-        // Check if player has required items
         if (!hasRequiredItems(player, cost)) {
             String costStr = formatCost(cost);
             ChatUtils.sendMessage(player, panelConfig.getNoMoneyMessage().replace("{COST}", costStr));
             return;
         }
 
-        // Remove items from player
         removeItems(player, cost);
 
-        // Extend guild validity
         try {
             Instant currentValidity = guild.getValidity();
             if (currentValidity == null) {
@@ -177,7 +157,6 @@ public class PanelGuiListener implements Listener {
             long renewSeconds = panelConfig.getRenewDurationSeconds();
             Instant newValidity;
 
-            // If current validity is in the past, start from now
             if (currentValidity.isBefore(Instant.now())) {
                 newValidity = Instant.now().plusSeconds(renewSeconds);
             } else {

@@ -34,12 +34,6 @@ public class TimeUtils {
         return !stringBuilder.isEmpty() ? stringBuilder.toString().trim() : time + "ms";
     }
 
-    /**
-     * Formats a duration in seconds to a human-readable string.
-     *
-     * @param seconds Duration in seconds
-     * @return Formatted duration string (e.g., "7 dni", "2 godz. 30 min.")
-     */
     public static String formatDuration(long seconds) {
         if (seconds <= 0) {
             return "0s";

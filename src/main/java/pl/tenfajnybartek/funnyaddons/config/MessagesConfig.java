@@ -5,12 +5,6 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.configuration.file.FileConfiguration;
 import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 
-/**
- * Configuration facade for all textual messages and Adventure Component wrappers.
- * <p>
- * Supports dynamic message retrieval using {@link PermissionType} enum metadata,
- * enabling config-driven message handling without hardcoded keys.
- */
 public class MessagesConfig {
 
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
@@ -21,10 +15,6 @@ public class MessagesConfig {
         this.cfg = cfg;
     }
 
-    /**
-     * Retrieves a message string from config.
-     * First tries "messages.{key}", then falls back to "{key}" directly.
-     */
     public String getMessage(String key, String defaultValue) {
         if (key == null) return defaultValue;
         String val;
@@ -41,17 +31,11 @@ public class MessagesConfig {
         return getMessage(key, "");
     }
 
-    /**
-     * Converts a legacy-colored string (using &) to Adventure Component.
-     */
     public Component toComponent(String text) {
         if (text == null) return Component.empty();
         return LEGACY.deserialize(text);
     }
 
-    /**
-     * Retrieves a message and converts it to Adventure Component.
-     */
     public Component getMessageAsComponent(String key) {
         return toComponent(getMessage(key, ""));
     }
@@ -60,7 +44,6 @@ public class MessagesConfig {
         return toComponent(getMessage(key, defaultValue));
     }
 
-    // ---------- Convenience getters for common messages ----------
 
     public String getInGuildMessage() {
         return getMessage("in-guild-message", "&cNie możesz użyć tej komendy, będąc w gildii!");
@@ -84,15 +67,6 @@ public class MessagesConfig {
         return v;
     }
 
-    // ---------- Generalized permissions messages ----------
-
-    /**
-     * Retrieves a permission-related message using the "perms-{key}" pattern.
-     *
-     * @param key the permission key suffix (e.g., "no-break" for "perms-no-break")
-     * @param defaultValue the default value if not found
-     * @return the message string
-     */
     public String getPermsMessage(String key, String defaultValue) {
         if (key == null || key.isEmpty()) {
             return defaultValue;
@@ -100,45 +74,18 @@ public class MessagesConfig {
         return getMessage("perms-" + key, defaultValue);
     }
 
-    /**
-     * Retrieves a permission-related message as Component.
-     *
-     * @param key the permission key suffix (e.g., "no-break" for "perms-no-break")
-     * @param defaultValue the default value if not found
-     * @return the message as Component
-     */
     public Component getPermsComponent(String key, String defaultValue) {
         return toComponent(getPermsMessage(key, defaultValue));
     }
 
-    // ---------- PermissionType-based Dynamic Message Lookup ----------
-
-    /**
-     * Retrieves the permission denial message for a specific PermissionType.
-     * <p>
-     * Uses the permission type's message key to look up the message in config.
-     * Falls back to the enum's default denial message if not configured.
-     *
-     * @param type The permission type to get the denial message for
-     * @return The configured denial message for the permission type
-     */
     public String getPermsMessageFor(PermissionType type) {
         return getPermsMessage(type.getMessageKey(), type.getDefaultDenialMessage());
     }
 
-    /**
-     * Retrieves the permission denial message as a Component for a specific PermissionType.
-     * <p>
-     * Uses the permission type's message key to look up the message in config.
-     *
-     * @param type The permission type to get the denial message for
-     * @return The configured denial message as a Component
-     */
     public Component getPermsComponentFor(PermissionType type) {
         return toComponent(getPermsMessageFor(type));
     }
 
-    // Permission denial messages
     public String getPermsNoBreakMessage() {
         return getPermsMessage("no-break", "&cNie masz uprawnień do niszczenia na terenie tej gildii!");
     }
@@ -171,7 +118,6 @@ public class MessagesConfig {
         return getPermsMessage("no-friendly-fire", "&cNie możesz obrażać członków swojej gildii!");
     }
 
-    // Permission denial messages as Components
     public Component getPermsNoBreakComponent() {
         return toComponent(getPermsNoBreakMessage());
     }

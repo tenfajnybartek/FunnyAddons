@@ -26,7 +26,6 @@ public class ConfigManager {
     private final File configFile;
     private final File panelFile;
 
-    // Config sub-classes for organized access
     private MessagesConfig messagesConfig;
     private PermissionsConfig permissionsConfig;
     private BossBarConfig bossBarConfig;
@@ -39,7 +38,6 @@ public class ConfigManager {
         this.panelFile = new File(plugin.getDataFolder(), "panel.yml");
         this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
 
-        // Save and load panel.yml
         saveDefaultPanelConfig();
         this.panelCfg = YamlConfiguration.loadConfiguration(this.panelFile);
 
@@ -65,32 +63,18 @@ public class ConfigManager {
         this.panelConfig = new PanelConfig(this.panelCfg);
     }
 
-    // ---------- Factory methods for config sub-classes ----------
-
-    /**
-     * Gets the MessagesConfig facade for message-related configuration.
-     */
     public MessagesConfig getMessagesConfig() {
         return messagesConfig;
     }
 
-    /**
-     * Gets the PermissionsConfig facade for permissions-related configuration.
-     */
     public PermissionsConfig getPermissionsConfig() {
         return permissionsConfig;
     }
 
-    /**
-     * Gets the BossBarConfig facade for bossbar-related configuration.
-     */
     public BossBarConfig getBossBarConfig() {
         return bossBarConfig;
     }
 
-    /**
-     * Gets the PanelConfig facade for guild panel-related configuration.
-     */
     public PanelConfig getPanelConfig() {
         return panelConfig;
     }
@@ -118,8 +102,6 @@ public class ConfigManager {
         return plugin;
     }
 
-    // ---------- Convenience getters dla często używanych wiadomości ----------
-    // (Delegating to MessagesConfig for backward compatibility)
     public String getInGuildMessage() {
         return messagesConfig.getInGuildMessage();
     }
@@ -140,7 +122,6 @@ public class ConfigManager {
         return messagesConfig.getLocationListMessage();
     }
 
-    // ---------- Pozostałe getters (Twoje dotychczasowe) ----------
     public int getMinBound() {
         return getConfig().getInt("bound.min");
     }
@@ -157,7 +138,6 @@ public class ConfigManager {
         return getConfig().getInt("listSize", 20);
     }
 
-    // ---------- BossBar methods (delegating to BossBarConfig for backward compatibility) ----------
     public BossBarMessage getBossBarMessage(String relation) {
         BossBarConfig.BossBarMessage msg = bossBarConfig.getBossBarMessage(relation);
         if (msg == null) return null;
@@ -198,20 +178,6 @@ public class ConfigManager {
         return bossBarConfig.isProgressBasedOnDistance();
     }
 
-    /**
-     * @deprecated Since version 1.0.0-SNAPSHOT. Use {@link BossBarConfig.BossBarMessage} from
-     * {@link #getBossBarConfig()} instead.
-     * <p>Example migration:</p>
-     * <pre>
-     * // Old way:
-     * ConfigManager.BossBarMessage msg = configManager.getBossBarMessage("MEMBER");
-     * String text = msg.message;
-     *
-     * // New way:
-     * BossBarConfig.BossBarMessage msg = configManager.getBossBarConfig().getBossBarMessage("MEMBER");
-     * String text = msg.getMessage();
-     * </pre>
-     */
     @Deprecated
     public static class BossBarMessage {
         public final String message;
@@ -225,39 +191,31 @@ public class ConfigManager {
         }
     }
 
-    // ---------- Permissions methods (delegating to PermissionsConfig for backward compatibility) ----------
 
-    // Rozmiar GUI dla MemberPermissionsGUI (domyślnie 27)
     public int getMemberPermissionsSize() {
         return permissionsConfig.getMemberPermissionsSize();
     }
 
-    // Maksymalna długość tytułu inventory (klient) - domyślnie 32
     public int getTitleMaxLength() {
         return permissionsConfig.getTitleMaxLength();
     }
 
-    // Pobierz Material z config.permissions.icons.{key} z fallbackiem
     public Material getIcon(String key, Material fallback) {
         return permissionsConfig.getIcon(key, fallback);
     }
 
-    // Domyślne uprawnienia dla roli (member/officer/owner) - lista Stringów
     public List<String> getDefaultPerms(String role) {
         return permissionsConfig.getDefaultPerms(role);
     }
 
-    // Czy relacje mają być włączone (relation.enable)
     public boolean isRelationEnabled() {
         return permissionsConfig.isRelationEnabled();
     }
 
-    // domyślne zachowanie relacji (follow_fg / follow_addon)
     public String getRelationDefaultBehavior() {
         return permissionsConfig.getRelationDefaultBehavior();
     }
 
-    // ---------- Permission messages (delegating to MessagesConfig for backward compatibility) ----------
 
     public String getPermsNoBreakMessage() { return messagesConfig.getPermsNoBreakMessage(); }
     public String getPermsNoPlaceMessage() { return messagesConfig.getPermsNoPlaceMessage(); }
@@ -268,7 +226,6 @@ public class ConfigManager {
     public String getPermsNoFireMessage() { return messagesConfig.getPermsNoFireMessage(); }
     public String getPermsNoFriendlyFireMessage() { return messagesConfig.getPermsNoFriendlyFireMessage(); }
 
-    // Permission messages as Components
     public Component getPermsNoBreakComponent() { return messagesConfig.getPermsNoBreakComponent(); }
     public Component getPermsNoPlaceComponent() { return messagesConfig.getPermsNoPlaceComponent(); }
     public Component getPermsNoOpenChestComponent() { return messagesConfig.getPermsNoOpenChestComponent(); }
@@ -278,68 +235,30 @@ public class ConfigManager {
     public Component getPermsNoFireComponent() { return messagesConfig.getPermsNoFireComponent(); }
     public Component getPermsNoFriendlyFireComponent() { return messagesConfig.getPermsNoFriendlyFireComponent(); }
 
-    // ---------- PermissionType-based Dynamic Lookups ----------
-
-    /**
-     * Gets the permission denial message for a specific PermissionType.
-     * <p>
-     * Uses the permission type's message key to look up the message in config.
-     *
-     * @param type The permission type to get the denial message for
-     * @return The configured denial message for the permission type
-     */
     public String getPermsMessageFor(PermissionType type) {
         return messagesConfig.getPermsMessageFor(type);
     }
 
-    /**
-     * Gets the permission denial message as a Component for a specific PermissionType.
-     *
-     * @param type The permission type to get the denial message for
-     * @return The configured denial message as a Component
-     */
     public Component getPermsComponentFor(PermissionType type) {
         return messagesConfig.getPermsComponentFor(type);
     }
 
-    /**
-     * Gets the slot for a permission type from config.
-     *
-     * @param type The permission type
-     * @return The configured slot number, or the default slot from the enum
-     */
     public int getSlotFor(PermissionType type) {
         return permissionsConfig.getSlotFor(type);
     }
 
-    /**
-     * Gets the display name for a permission type from config.
-     *
-     * @param type The permission type
-     * @return The configured display name, or the default name from the enum
-     */
     public String getDisplayNameFor(PermissionType type) {
         return permissionsConfig.getDisplayNameFor(type);
     }
 
-    /**
-     * Gets the icon Material for a permission type from config.
-     *
-     * @param type The permission type
-     * @return The configured Material icon, or the default icon from the enum
-     */
     public Material getIconFor(PermissionType type) {
         return permissionsConfig.getIconFor(type);
     }
 
-    // ---------- Component utilities (delegating to MessagesConfig) ----------
-
-    // Parsowanie legacy-colored string -> Component
     public Component toComponent(String text) {
         return messagesConfig.toComponent(text);
     }
 
-    // Pobierz komunikat jako Component (z "messages." prefix)
     public Component messageAsComponent(String key) {
         return messagesConfig.getMessageAsComponent(key);
     }

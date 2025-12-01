@@ -7,15 +7,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-/**
- * Configuration facade for the guild panel system.
- * <p>
- * Reads configuration from panel.yml and provides typed access to:
- * - Main panel GUI settings
- * - Territory enlargement levels and costs
- * - Guild validity renewal settings
- * - Guild effects configuration
- */
 public class PanelConfig {
 
     private final FileConfiguration cfg;
@@ -24,7 +15,6 @@ public class PanelConfig {
         this.cfg = cfg;
     }
 
-    // ==================== Messages ====================
 
     public String getMessage(String key) {
         return cfg.getString("messages." + key, "&cBrak wiadomości: " + key);
@@ -70,7 +60,6 @@ public class PanelConfig {
         return getMessage("effect-applied");
     }
 
-    // ==================== Main Panel GUI ====================
 
     public int getMainGuiSize() {
         return cfg.getInt("panel.main.size", 27);
@@ -98,7 +87,6 @@ public class PanelConfig {
         return cfg.getStringList("panel.main.items." + itemKey + ".lore");
     }
 
-    // ==================== Territory GUI ====================
 
     public int getTerritoryGuiSize() {
         return cfg.getInt("panel.territory.size", 27);
@@ -108,11 +96,6 @@ public class PanelConfig {
         return cfg.getString("panel.territory.title", "&aPowiększenie terenu gildii");
     }
 
-    /**
-     * Gets all configured territory levels.
-     *
-     * @return Map of level number to TerritoryLevel configuration
-     */
     public Map<Integer, TerritoryLevel> getTerritoryLevels() {
         Map<Integer, TerritoryLevel> levels = new LinkedHashMap<>();
         ConfigurationSection section = cfg.getConfigurationSection("panel.territory.levels");
@@ -149,8 +132,6 @@ public class PanelConfig {
         return cfg.getStringList("panel.territory.back.lore");
     }
 
-    // ==================== Renew Settings ====================
-
     public long getRenewDurationSeconds() {
         return cfg.getLong("panel.renew.duration-seconds", 604800L);
     }
@@ -158,8 +139,6 @@ public class PanelConfig {
     public Map<Material, Integer> getRenewCost() {
         return parseCostSection("panel.renew.cost");
     }
-
-    // ==================== Effects GUI ====================
 
     public int getEffectsGuiSize() {
         return cfg.getInt("panel.effects.size", 27);
@@ -169,11 +148,6 @@ public class PanelConfig {
         return cfg.getString("panel.effects.title", "&dEfekty gildii");
     }
 
-    /**
-     * Gets all configured effect options.
-     *
-     * @return Map of effect key to EffectOption configuration
-     */
     public Map<String, EffectOption> getEffectOptions() {
         Map<String, EffectOption> options = new LinkedHashMap<>();
         ConfigurationSection section = cfg.getConfigurationSection("panel.effects.options");
@@ -206,8 +180,6 @@ public class PanelConfig {
         return cfg.getStringList("panel.effects.back.lore");
     }
 
-    // ==================== Helper Methods ====================
-
     private Map<Material, Integer> parseCostSection(String path) {
         Map<Material, Integer> cost = new LinkedHashMap<>();
         ConfigurationSection section = cfg.getConfigurationSection(path);
@@ -222,11 +194,6 @@ public class PanelConfig {
         return cost;
     }
 
-    // ==================== Inner Classes ====================
-
-    /**
-     * Represents a territory level configuration.
-     */
     public static class TerritoryLevel {
         private final int level;
         private final int bounds;
@@ -308,9 +275,6 @@ public class PanelConfig {
         }
     }
 
-    /**
-     * Represents an effect option configuration.
-     */
     public static class EffectOption {
         private final String key;
         private final int slot;
@@ -356,17 +320,14 @@ public class PanelConfig {
 
             String upperName = name.toUpperCase();
 
-            // Try direct registry lookup first (Paper 1.21+)
             try {
                 PotionEffectType type = org.bukkit.Registry.POTION_EFFECT_TYPE.get(
                         org.bukkit.NamespacedKey.minecraft(name.toLowerCase())
                 );
                 if (type != null) return type;
             } catch (NoSuchFieldError | NoClassDefFoundError ignored) {
-                // Registry not available, fall through to legacy mapping
             }
 
-            // Map legacy names to new names
             if (upperName.equals("STRENGTH") || upperName.equals("INCREASE_DAMAGE")) {
                 return PotionEffectType.STRENGTH;
             } else if (upperName.equals("SPEED")) {

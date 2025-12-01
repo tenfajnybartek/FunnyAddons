@@ -6,22 +6,9 @@ import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 
 import java.util.List;
 
-/**
- * Configuration facade for permissions GUI, defaults, icons, and relations.
- * <p>
- * Uses {@link PermissionsConfigKey} enum for typed configuration keys,
- * avoiding magic strings and providing compile-time safety.
- * <p>
- * Also provides methods to retrieve configuration values using {@link PermissionType}
- * enum metadata for dynamic lookups, reducing code duplication and enabling
- * config-driven GUI creation.
- */
+
 public class PermissionsConfig {
 
-    /**
-     * The config section name for relation settings.
-     * Used in path: permissions.relation.RELATION.{relationType}.enforce
-     */
     private static final String RELATION_SECTION = "RELATION";
 
     private final FileConfiguration cfg;
@@ -30,45 +17,16 @@ public class PermissionsConfig {
         this.cfg = cfg;
     }
 
-    // ---------- PermissionType-based Dynamic Lookups ----------
-
-    /**
-     * Gets the slot for a permission type from config, with fallback to enum default.
-     * <p>
-     * Uses the permission type's config key to look up the slot in config.
-     * Falls back to the permission type's default slot if not configured.
-     *
-     * @param type The permission type
-     * @return The configured slot number, or the default slot from the enum
-     */
     public int getSlotFor(PermissionType type) {
         String path = "permissions.gui.slots." + type.getConfigKey();
         return cfg.getInt(path, type.getDefaultSlot());
     }
 
-    /**
-     * Gets the display name for a permission type from config, with fallback to enum default.
-     * <p>
-     * Uses the permission type's config key to look up the name in config.
-     * Falls back to the permission type's default display name if not configured.
-     *
-     * @param type The permission type
-     * @return The configured display name, or the default name from the enum
-     */
     public String getDisplayNameFor(PermissionType type) {
         String path = "permissions.gui.names." + type.getConfigKey();
         return cfg.getString(path, type.getDefaultDisplayName());
     }
 
-    /**
-     * Gets the icon Material for a permission type from config, with fallback to enum default.
-     * <p>
-     * Uses the permission type's config key to look up the icon in config.
-     * Falls back to the permission type's default icon if not configured.
-     *
-     * @param type The permission type
-     * @return The configured Material icon, or the default icon from the enum
-     */
     public Material getIconFor(PermissionType type) {
         String path = "permissions.icons." + type.getConfigKey();
         String mat = cfg.getString(path, null);
@@ -77,15 +35,6 @@ public class PermissionsConfig {
         return m != null ? m : type.getDefaultIcon();
     }
 
-    /**
-     * Finds a PermissionType by the given GUI slot.
-     * <p>
-     * Checks all permission types and returns the one that matches the given slot
-     * based on current configuration (with fallback to enum defaults).
-     *
-     * @param slot The slot to search for
-     * @return The matching PermissionType, or null if no permission is at that slot
-     */
     public PermissionType getPermissionTypeBySlot(int slot) {
         for (PermissionType type : PermissionType.values()) {
             if (getSlotFor(type) == slot) {
@@ -95,11 +44,6 @@ public class PermissionsConfig {
         return null;
     }
 
-    // ---------- GUI Settings ----------
-
-    /**
-     * Gets the inventory size for member permissions GUI.
-     */
     public int getMemberPermissionsSize() {
         return cfg.getInt(
                 PermissionsConfigKey.GUI_MEMBER_PERMISSIONS_SIZE.getPath(),
@@ -107,9 +51,6 @@ public class PermissionsConfig {
         );
     }
 
-    /**
-     * Gets the maximum length for inventory titles (Minecraft client limitation).
-     */
     public int getTitleMaxLength() {
         return cfg.getInt(
                 PermissionsConfigKey.GUI_TITLE_MAX_LENGTH.getPath(),
@@ -117,9 +58,6 @@ public class PermissionsConfig {
         );
     }
 
-    /**
-     * Gets the members GUI title pattern.
-     */
     public String getMembersTitle() {
         return cfg.getString(
                 PermissionsConfigKey.GUI_MEMBERS_TITLE.getPath(),
@@ -127,9 +65,6 @@ public class PermissionsConfig {
         );
     }
 
-    /**
-     * Gets the member permissions GUI title pattern.
-     */
     public String getMemberPermsTitle() {
         return cfg.getString(
                 PermissionsConfigKey.GUI_MEMBER_PERMS_TITLE.getPath(),
@@ -137,14 +72,6 @@ public class PermissionsConfig {
         );
     }
 
-    // ---------- Slots ----------
-
-    /**
-     * Gets the slot for a permission type from config.
-     *
-     * @param key      The PermissionsConfigKey for the slot
-     * @return The configured slot number
-     */
     public int getSlot(PermissionsConfigKey key) {
         return cfg.getInt(key.getPath(), key.getDefaultInt());
     }
@@ -189,14 +116,6 @@ public class PermissionsConfig {
         return getSlot(PermissionsConfigKey.SLOT_INFO);
     }
 
-    // ---------- Display Names ----------
-
-    /**
-     * Gets the display name for a permission type from config.
-     *
-     * @param key The PermissionsConfigKey for the name
-     * @return The configured display name
-     */
     public String getName(PermissionsConfigKey key) {
         return cfg.getString(key.getPath(), key.getDefaultString());
     }
@@ -241,13 +160,6 @@ public class PermissionsConfig {
         return getName(PermissionsConfigKey.NAME_INFO);
     }
 
-    // ---------- Lore ----------
-
-    /**
-     * Gets the toggle lore from config.
-     *
-     * @return The configured toggle lore
-     */
     public String getToggleLore() {
         return cfg.getString(
                 PermissionsConfigKey.LORE_TOGGLE.getPath(),
@@ -255,11 +167,6 @@ public class PermissionsConfig {
         );
     }
 
-    /**
-     * Gets the info lore from config.
-     *
-     * @return The configured info lore
-     */
     public String getInfoLore() {
         return cfg.getString(
                 PermissionsConfigKey.LORE_INFO.getPath(),
@@ -267,13 +174,6 @@ public class PermissionsConfig {
         );
     }
 
-    // ---------- State Prefixes ----------
-
-    /**
-     * Gets the state prefix for ON state from config.
-     *
-     * @return The configured state prefix
-     */
     public String getStateOn() {
         return cfg.getString(
                 PermissionsConfigKey.STATE_ON.getPath(),
@@ -281,11 +181,6 @@ public class PermissionsConfig {
         );
     }
 
-    /**
-     * Gets the state prefix for OFF state from config.
-     *
-     * @return The configured state prefix
-     */
     public String getStateOff() {
         return cfg.getString(
                 PermissionsConfigKey.STATE_OFF.getPath(),
@@ -293,11 +188,6 @@ public class PermissionsConfig {
         );
     }
 
-    // ---------- Icons ----------
-
-    /**
-     * Gets the Material for a permission icon from config.
-     */
     public Material getIcon(String key, Material fallback) {
         String path = "permissions.icons." + key;
         String mat = cfg.getString(path, null);
@@ -306,13 +196,6 @@ public class PermissionsConfig {
         return m != null ? m : fallback;
     }
 
-    /**
-     * Gets the Material for a permission icon using a config key enum.
-     *
-     * @param key      The PermissionsConfigKey for the icon
-     * @param fallback The fallback Material if not configured
-     * @return The configured Material or fallback
-     */
     public Material getIcon(PermissionsConfigKey key, Material fallback) {
         String mat = cfg.getString(key.getPath(), null);
         if (mat == null || mat.isBlank()) return fallback;
@@ -320,7 +203,6 @@ public class PermissionsConfig {
         return m != null ? m : fallback;
     }
 
-    // Convenience methods for specific icons
     public Material getBreakIcon() {
         return getIcon(PermissionsConfigKey.ICON_BREAK, Material.DIAMOND_PICKAXE);
     }
@@ -361,21 +243,10 @@ public class PermissionsConfig {
         return getIcon(PermissionsConfigKey.ICON_INFO, Material.PLAYER_HEAD);
     }
 
-    // ---------- Default Permissions ----------
-
-    /**
-     * Gets the default permissions for a role (member/officer/owner).
-     */
     public List<String> getDefaultPerms(String role) {
         return cfg.getStringList("permissions.defaults." + role);
     }
 
-    /**
-     * Gets the default permissions for a role using config key.
-     *
-     * @param key The PermissionsConfigKey for the role defaults
-     * @return List of permission names
-     */
     public List<String> getDefaultPerms(PermissionsConfigKey key) {
         return cfg.getStringList(key.getPath());
     }
@@ -392,11 +263,6 @@ public class PermissionsConfig {
         return getDefaultPerms(PermissionsConfigKey.DEFAULTS_OWNER);
     }
 
-    // ---------- Relations ----------
-
-    /**
-     * Checks if relation-based permissions are enabled.
-     */
     public boolean isRelationEnabled() {
         return cfg.getBoolean(
                 PermissionsConfigKey.RELATION_ENABLE.getPath(),
@@ -404,9 +270,6 @@ public class PermissionsConfig {
         );
     }
 
-    /**
-     * Gets the default behavior for relations (follow_fg / follow_addon).
-     */
     public String getRelationDefaultBehavior() {
         return cfg.getString(
                 PermissionsConfigKey.RELATION_DEFAULT_BEHAVIOR.getPath(),
@@ -414,12 +277,6 @@ public class PermissionsConfig {
         );
     }
 
-    /**
-     * Checks if enforcement is enabled for a specific relation type.
-     *
-     * @param relationType The relation type (MEMBER, ALLY, ENEMY, OUTSIDER)
-     * @return true if enforcement is enabled for the given relation type
-     */
     public boolean isRelationEnforced(String relationType) {
         return cfg.getBoolean("permissions.relation." + RELATION_SECTION + "." + relationType + ".enforce", false);
     }

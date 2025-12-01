@@ -46,9 +46,7 @@ public class MemberPermissionsGUI {
         GUIHolder holder = new GUIHolder(GUIHolder.Kind.MEMBER_PERMISSIONS, guildTag, memberUuid);
         Inventory inv = Bukkit.createInventory(holder, size, titleComp);
 
-        // Player head with info
         int headSlot = permCfg.getInfoSlot();
-        // Adjust head slot dynamically based on size if needed
         if (headSlot >= size) {
             headSlot = (size == 27) ? 13 : 4;
         }
@@ -62,19 +60,16 @@ public class MemberPermissionsGUI {
         }
         inv.setItem(headSlot, skull);
 
-        // Get current permissions
         Set<PermissionType> has = perms.getPermissions(guildTag, memberUuid);
 
-        // State prefixes from config
+
         String stateOn = permCfg.getStateOn();
         String stateOff = permCfg.getStateOff();
         String toggleLore = permCfg.getToggleLore();
 
-        // Create toggle items for all permission types dynamically using enum metadata
         for (PermissionType type : PermissionType.values()) {
             int slot = permCfg.getSlotFor(type);
             if (slot >= size) {
-                // Warn about misconfigured slots to help with debugging
                 LOGGER.warning("[FunnyAddons] Permission " + type.name() + " has slot " + slot +
                         " configured, but GUI size is only " + size + ". Skipping this permission.");
                 continue;
@@ -87,7 +82,6 @@ public class MemberPermissionsGUI {
             inv.setItem(slot, createToggleItem(icon, name, hasPermission, stateOn, stateOff, toggleLore));
         }
 
-        // Back button - adjust slot to size - 1 if configured slot is out of bounds
         int backSlot = permCfg.getBackSlot();
         if (backSlot >= size) {
             backSlot = size - 1;
@@ -99,17 +93,6 @@ public class MemberPermissionsGUI {
         GUIContext.registerMemberPermissionsInventory(opener.getUniqueId(), guildTag, memberUuid, perms);
     }
 
-    /**
-     * Creates a toggle item for a permission with config-driven name, state prefix, and lore.
-     *
-     * @param mat       The material for the item
-     * @param name      The base display name from config
-     * @param on        Whether the permission is currently enabled
-     * @param stateOn   The state prefix for ON state
-     * @param stateOff  The state prefix for OFF state
-     * @param lore      The lore text for the toggle item
-     * @return The created ItemStack
-     */
     private static ItemStack createToggleItem(Material mat, String name,
                                               boolean on, String stateOn, String stateOff, String lore) {
         String label = (on ? stateOn : stateOff) + name;

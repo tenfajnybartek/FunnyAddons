@@ -45,13 +45,11 @@ public class PermissionsGuiListener implements Listener {
 
         PermissionsConfig permCfg = plugin.getConfigManager().getPermissionsConfig();
 
-        // Handle members list inventory
         if (isMembersInv && !isMemberPermInv) {
             handleMembersListClick(event, viewer, viewerId);
             return;
         }
 
-        // Handle member permissions inventory
         if (isMemberPermInv) {
             handleMemberPermissionsClick(event, viewer, viewerId, permCfg);
         }
@@ -87,13 +85,11 @@ public class PermissionsGuiListener implements Listener {
         int slot = event.getSlot();
         int size = event.getInventory().getSize();
 
-        // Check back button first (slot-based or name-based for compatibility)
         int backSlot = permCfg.getBackSlot();
         if (backSlot >= size) {
             backSlot = size - 1;
         }
         if (slot == backSlot) {
-            // Check if it's actually the back item by verifying material or name
             ItemMeta itemMeta = clicked.getItemMeta();
             Component displayComp = itemMeta != null ? itemMeta.displayName() : null;
             String display = displayComp != null ? PlainTextComponentSerializer.plainText().serialize(displayComp) : null;
@@ -108,7 +104,6 @@ public class PermissionsGuiListener implements Listener {
             }
         }
 
-        // Use dynamic slot-based detection for permission toggles via PermissionType enum
         PermissionType toggledType = permCfg.getPermissionTypeBySlot(slot);
 
         if (toggledType != null) {
