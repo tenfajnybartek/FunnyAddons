@@ -69,13 +69,15 @@ public class GuildTerrainBarRunnable implements Runnable {
 
         switch (mode) {
             case BOSS_BAR: {
-                BossBar bossBar = this.bossBarManager.find(player);
-
                 BossBarConfig.BossBarMessage bbMsg = this.bossBarConfig.getBossBarMessage(relation.name());
                 if (bbMsg == null) {
-                    bossBar.setVisible(false);
+                    // Remove the bossbar entirely instead of just hiding it
+                    // This prevents "stale" bossbars from being shown
+                    this.bossBarManager.remove(player);
                     return;
                 }
+
+                BossBar bossBar = this.bossBarManager.find(player);
 
                 String message = bbMsg.getMessage()
                         .replace("{GUILD-TAG}", terrainGuild.getTag())

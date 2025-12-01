@@ -3,7 +3,9 @@ package pl.tenfajnybartek.funnyaddons.managers;
 import net.dzikoysk.funnyguilds.guild.Guild;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class PlayerPositionManager {
@@ -24,5 +26,27 @@ public class PlayerPositionManager {
 
     public void remove(UUID uniqueId) {
         this.positions.remove(uniqueId);
+    }
+
+    /**
+     * Removes all player position entries that point to the specified guild.
+     * Returns the set of UUIDs that were removed.
+     *
+     * @param guild the guild to remove entries for
+     * @return set of player UUIDs that were removed
+     */
+    public Set<UUID> removeByGuild(Guild guild) {
+        Set<UUID> removed = new HashSet<>();
+        if (guild == null) {
+            return removed;
+        }
+        positions.entrySet().removeIf(entry -> {
+            if (guild.equals(entry.getValue())) {
+                removed.add(entry.getKey());
+                return true;
+            }
+            return false;
+        });
+        return removed;
     }
 }

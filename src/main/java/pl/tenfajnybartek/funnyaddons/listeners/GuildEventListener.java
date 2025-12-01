@@ -20,6 +20,9 @@ import pl.tenfajnybartek.funnyaddons.managers.PlayerPositionManager;
 import pl.tenfajnybartek.funnyaddons.utils.GuildTerrainBarMode;
 import pl.tenfajnybartek.funnyaddons.utils.GuildTerrainBarRunnable;
 
+import java.util.Set;
+import java.util.UUID;
+
 /**
  * Listener that handles FunnyGuilds events to refresh bossbars/actionbars
  * when guild membership changes (create, delete, join, leave, kick).
@@ -58,8 +61,8 @@ public class GuildEventListener implements Listener {
     }
 
     /**
-     * When a guild is deleted, clear bossbars for all affected members
-     * and refresh their display based on current position.
+     * When a guild is deleted, clear bossbars for all players who were on
+     * that guild's terrain (not just members).
      */
     @EventHandler
     public void onGuildDelete(GuildDeleteEvent event) {
@@ -68,9 +71,13 @@ public class GuildEventListener implements Listener {
             return;
         }
 
-        // Handle all members of the deleted guild
-        for (User member : deletedGuild.getMembers()) {
-            Player player = Bukkit.getPlayer(member.getUUID());
+        // Remove all position entries pointing to the deleted guild
+        // This handles ALL players on the terrain, not just members
+        Set<UUID> affectedPlayers = playerPositionManager.removeByGuild(deletedGuild);
+
+        // Clear bossbars and refresh display for all affected players
+        for (UUID uuid : affectedPlayers) {
+            Player player = Bukkit.getPlayer(uuid);
             if (player == null) {
                 continue;
             }
@@ -78,14 +85,11 @@ public class GuildEventListener implements Listener {
             // Clear the current bossbar
             bossBarManager.remove(player);
 
-            // Clear the player position entry if it was pointing to the deleted guild
-            Guild currentTerrainGuild = playerPositionManager.find(player.getUniqueId());
-            if (currentTerrainGuild != null && currentTerrainGuild.equals(deletedGuild)) {
-                playerPositionManager.remove(player.getUniqueId());
-            }
+            // Get the user (may be null if not registered)
+            User user = FunnyGuilds.getInstance().getUserManager().findByUuid(uuid).orNull();
 
-            // Refresh the display based on current position
-            refreshPlayerDisplay(player, member);
+            // Refresh display - with null terrainGuild, the bossbar will be cleared
+            refreshPlayerDisplayWithoutLookup(player, user, null);
         }
     }
 
@@ -157,6 +161,13 @@ public class GuildEventListener implements Listener {
             }
         }
 
+        refreshPlayerDisplayWithoutLookup(player, user, terrainGuild);
+    }
+
+    /**
+     * Refreshes the bossbar/actionbar display for a player with an already-known terrain guild.
+     */
+    private void refreshPlayerDisplayWithoutLookup(Player player, User user, Guild terrainGuild) {
         String modeStr = configManager.getBossBarMode();
         GuildTerrainBarMode mode = GuildTerrainBarMode.valueOf(modeStr);
         boolean progressBased = configManager.isBossBarProgressBasedOnDistance();
