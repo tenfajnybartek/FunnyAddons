@@ -7,6 +7,9 @@ import java.util.List;
 
 /**
  * Configuration facade for permissions GUI, defaults, icons, and relations.
+ * <p>
+ * Uses {@link PermissionsConfigKey} enum for typed configuration keys,
+ * avoiding magic strings and providing compile-time safety.
  */
 public class PermissionsConfig {
 
@@ -28,28 +31,40 @@ public class PermissionsConfig {
      * Gets the inventory size for member permissions GUI.
      */
     public int getMemberPermissionsSize() {
-        return cfg.getInt("permissions.gui.member-permissions-size", 27);
+        return cfg.getInt(
+                PermissionsConfigKey.GUI_MEMBER_PERMISSIONS_SIZE.getPath(),
+                PermissionsConfigKey.GUI_MEMBER_PERMISSIONS_SIZE.getDefaultInt()
+        );
     }
 
     /**
      * Gets the maximum length for inventory titles (Minecraft client limitation).
      */
     public int getTitleMaxLength() {
-        return cfg.getInt("permissions.gui.title-max-length", 32);
+        return cfg.getInt(
+                PermissionsConfigKey.GUI_TITLE_MAX_LENGTH.getPath(),
+                PermissionsConfigKey.GUI_TITLE_MAX_LENGTH.getDefaultInt()
+        );
     }
 
     /**
      * Gets the members GUI title pattern.
      */
     public String getMembersTitle() {
-        return cfg.getString("permissions.gui.members-title", "&cGildia: &e{GUILD} - członkowie");
+        return cfg.getString(
+                PermissionsConfigKey.GUI_MEMBERS_TITLE.getPath(),
+                PermissionsConfigKey.GUI_MEMBERS_TITLE.getDefaultString()
+        );
     }
 
     /**
      * Gets the member permissions GUI title pattern.
      */
     public String getMemberPermsTitle() {
-        return cfg.getString("permissions.gui.member-perms-title", "&cUprawnienia: &e{GUILD} - {NAME}");
+        return cfg.getString(
+                PermissionsConfigKey.GUI_MEMBER_PERMS_TITLE.getPath(),
+                PermissionsConfigKey.GUI_MEMBER_PERMS_TITLE.getDefaultString()
+        );
     }
 
     // ---------- Icons ----------
@@ -65,45 +80,59 @@ public class PermissionsConfig {
         return m != null ? m : fallback;
     }
 
+    /**
+     * Gets the Material for a permission icon using a config key enum.
+     *
+     * @param key      The PermissionsConfigKey for the icon
+     * @param fallback The fallback Material if not configured
+     * @return The configured Material or fallback
+     */
+    public Material getIcon(PermissionsConfigKey key, Material fallback) {
+        String mat = cfg.getString(key.getPath(), null);
+        if (mat == null || mat.isBlank()) return fallback;
+        Material m = Material.matchMaterial(mat);
+        return m != null ? m : fallback;
+    }
+
     // Convenience methods for specific icons
     public Material getBreakIcon() {
-        return getIcon("break", Material.DIAMOND_PICKAXE);
+        return getIcon(PermissionsConfigKey.ICON_BREAK, Material.DIAMOND_PICKAXE);
     }
 
     public Material getPlaceIcon() {
-        return getIcon("place", Material.OAK_PLANKS);
+        return getIcon(PermissionsConfigKey.ICON_PLACE, Material.OAK_PLANKS);
     }
 
     public Material getInteractBlockIcon() {
-        return getIcon("interact_block", Material.LEVER);
+        return getIcon(PermissionsConfigKey.ICON_INTERACT_BLOCK, Material.LEVER);
     }
 
     public Material getOpenChestIcon() {
-        return getIcon("open_chest", Material.CHEST);
+        return getIcon(PermissionsConfigKey.ICON_OPEN_CHEST, Material.CHEST);
     }
 
     public Material getOpenEnderChestIcon() {
-        return getIcon("open_ender_chest", Material.ENDER_CHEST);
+        return getIcon(PermissionsConfigKey.ICON_OPEN_ENDER_CHEST, Material.ENDER_CHEST);
     }
 
     public Material getUseBucketsIcon() {
-        return getIcon("use_buckets", Material.WATER_BUCKET);
+        return getIcon(PermissionsConfigKey.ICON_USE_BUCKETS, Material.WATER_BUCKET);
     }
 
     public Material getUseFireIcon() {
-        return getIcon("use_fire", Material.FLINT_AND_STEEL);
+        return getIcon(PermissionsConfigKey.ICON_USE_FIRE, Material.FLINT_AND_STEEL);
     }
 
     public Material getFriendlyFireIcon() {
-        return getIcon("friendly_fire", Material.TIPPED_ARROW);
+        return getIcon(PermissionsConfigKey.ICON_FRIENDLY_FIRE, Material.TIPPED_ARROW);
     }
 
     public Material getBackIcon() {
-        return getIcon("back", Material.BARRIER);
+        return getIcon(PermissionsConfigKey.ICON_BACK, Material.BARRIER);
     }
 
     public Material getInfoIcon() {
-        return getIcon("info", Material.PLAYER_HEAD);
+        return getIcon(PermissionsConfigKey.ICON_INFO, Material.PLAYER_HEAD);
     }
 
     // ---------- Default Permissions ----------
@@ -115,16 +144,26 @@ public class PermissionsConfig {
         return cfg.getStringList("permissions.defaults." + role);
     }
 
+    /**
+     * Gets the default permissions for a role using config key.
+     *
+     * @param key The PermissionsConfigKey for the role defaults
+     * @return List of permission names
+     */
+    public List<String> getDefaultPerms(PermissionsConfigKey key) {
+        return cfg.getStringList(key.getPath());
+    }
+
     public List<String> getMemberDefaultPerms() {
-        return getDefaultPerms("member");
+        return getDefaultPerms(PermissionsConfigKey.DEFAULTS_MEMBER);
     }
 
     public List<String> getOfficerDefaultPerms() {
-        return getDefaultPerms("officer");
+        return getDefaultPerms(PermissionsConfigKey.DEFAULTS_OFFICER);
     }
 
     public List<String> getOwnerDefaultPerms() {
-        return getDefaultPerms("owner");
+        return getDefaultPerms(PermissionsConfigKey.DEFAULTS_OWNER);
     }
 
     // ---------- Relations ----------
@@ -133,14 +172,20 @@ public class PermissionsConfig {
      * Checks if relation-based permissions are enabled.
      */
     public boolean isRelationEnabled() {
-        return cfg.getBoolean("permissions.relation.enable", false);
+        return cfg.getBoolean(
+                PermissionsConfigKey.RELATION_ENABLE.getPath(),
+                PermissionsConfigKey.RELATION_ENABLE.getDefaultBoolean()
+        );
     }
 
     /**
      * Gets the default behavior for relations (follow_fg / follow_addon).
      */
     public String getRelationDefaultBehavior() {
-        return cfg.getString("permissions.relation.default-behavior", "follow_fg");
+        return cfg.getString(
+                PermissionsConfigKey.RELATION_DEFAULT_BEHAVIOR.getPath(),
+                PermissionsConfigKey.RELATION_DEFAULT_BEHAVIOR.getDefaultString()
+        );
     }
 
     /**

@@ -84,7 +84,7 @@ public final class FunnyAddons extends JavaPlugin {
     private void initCommands() {
         Objects.requireNonNull(getCommand("wolnemiejsce")).setExecutor(new FreeSpaceCommand(this));
         Objects.requireNonNull(getCommand("kupkordy")).setExecutor(new BuyCoordsCommand(configManager, guildManager));
-        Objects.requireNonNull(getCommand("fgaddonsreload")).setExecutor(new ReloadConfigCommand(configManager));
+        Objects.requireNonNull(getCommand("fgaddonsreload")).setExecutor(new ReloadConfigCommand(configManager, permissionsManager));
         Objects.requireNonNull(getCommand("uprawnienia")).setExecutor(new PermissionsCommand(this.getConfigManager(), permissionsManager));
         logInfo("Komendy zarejestrowane.");
     }
@@ -145,6 +145,15 @@ public final class FunnyAddons extends JavaPlugin {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    /**
+     * Gets the PermissionsManager instance for guild permission operations.
+     *
+     * @return The PermissionsManager instance
+     */
+    public PermissionsManager getPermissionsManager() {
+        return permissionsManager;
     }
 
     public static FunnyAddons getPluginInstance() {
