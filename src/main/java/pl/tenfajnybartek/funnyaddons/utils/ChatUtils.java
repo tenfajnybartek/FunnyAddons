@@ -27,11 +27,11 @@ public class ChatUtils {
 
     /**
      * Creates an ItemStack with the specified material, display name, and lore.
-     * Uses Adventure API and legacy color codes (&amp;).
+     * Uses Adventure API and legacy color codes (&).
      *
      * @param material The material for the item
-     * @param name     The display name (supports &amp; color codes)
-     * @param lore     The lore lines (supports &amp; color codes), can be null or empty
+     * @param name     The display name (supports & color codes)
+     * @param lore     The lore lines (supports & color codes), can be null or empty
      * @return The created ItemStack with configured metadata
      */
     public static ItemStack makeItem(Material material, String name, List<String> lore) {
@@ -53,8 +53,8 @@ public class ChatUtils {
      * Creates an ItemStack with the specified material, display name, and single lore line.
      *
      * @param material The material for the item
-     * @param name     The display name (supports &amp; color codes)
-     * @param lore     A single lore line (supports &amp; color codes), can be null
+     * @param name     The display name (supports & color codes)
+     * @param lore     A single lore line (supports & color codes), can be null
      * @return The created ItemStack with configured metadata
      */
     public static ItemStack makeItem(Material material, String name, String lore) {
@@ -65,10 +65,10 @@ public class ChatUtils {
      * Creates an ItemStack with the specified material and display name (no lore).
      *
      * @param material The material for the item
-     * @param name     The display name (supports &amp; color codes)
+     * @param name     The display name (supports & color codes)
      * @return The created ItemStack with configured metadata
      */
     public static ItemStack makeItem(Material material, String name) {
-        return makeItem(material, name, (List<String>) null);
+        return makeItem(material, name, (String) null);
     }
 }
