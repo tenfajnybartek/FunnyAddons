@@ -10,6 +10,7 @@ import net.dzikoysk.funnyguilds.guild.Guild;
 import net.dzikoysk.funnyguilds.guild.Region;
 import net.dzikoysk.funnyguilds.guild.RegionManager;
 import net.dzikoysk.funnyguilds.user.User;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,17 +47,14 @@ public class GuildEventListener implements Listener {
      */
     @EventHandler
     public void onGuildCreate(GuildCreateEvent event) {
-        User owner = event.getCreator();
-        if (owner == null) {
-            return;
-        }
+        event.getDoer().peek(owner -> {
+            Player player = Bukkit.getPlayer(owner.getUUID());
+            if (player == null) {
+                return;
+            }
 
-        Player player = owner.getPlayer().orNull();
-        if (player == null) {
-            return;
-        }
-
-        refreshPlayerDisplay(player, owner);
+            refreshPlayerDisplay(player, owner);
+        });
     }
 
     /**
@@ -72,7 +70,7 @@ public class GuildEventListener implements Listener {
 
         // Handle all members of the deleted guild
         for (User member : deletedGuild.getMembers()) {
-            Player player = member.getPlayer().orNull();
+            Player player = Bukkit.getPlayer(member.getUUID());
             if (player == null) {
                 continue;
             }
@@ -96,17 +94,14 @@ public class GuildEventListener implements Listener {
      */
     @EventHandler
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-        User user = event.getMember();
-        if (user == null) {
-            return;
-        }
+        event.getDoer().peek(user -> {
+            Player player = Bukkit.getPlayer(user.getUUID());
+            if (player == null) {
+                return;
+            }
 
-        Player player = user.getPlayer().orNull();
-        if (player == null) {
-            return;
-        }
-
-        refreshPlayerDisplay(player, user);
+            refreshPlayerDisplay(player, user);
+        });
     }
 
     /**
@@ -114,19 +109,16 @@ public class GuildEventListener implements Listener {
      */
     @EventHandler
     public void onGuildMemberLeave(GuildMemberLeaveEvent event) {
-        User user = event.getMember();
-        if (user == null) {
-            return;
-        }
+        event.getDoer().peek(user -> {
+            Player player = Bukkit.getPlayer(user.getUUID());
+            if (player == null) {
+                return;
+            }
 
-        Player player = user.getPlayer().orNull();
-        if (player == null) {
-            return;
-        }
-
-        // Clear the current bossbar and refresh
-        bossBarManager.remove(player);
-        refreshPlayerDisplay(player, user);
+            // Clear the current bossbar and refresh
+            bossBarManager.remove(player);
+            refreshPlayerDisplay(player, user);
+        });
     }
 
     /**
@@ -134,19 +126,16 @@ public class GuildEventListener implements Listener {
      */
     @EventHandler
     public void onGuildMemberKick(GuildMemberKickEvent event) {
-        User user = event.getMember();
-        if (user == null) {
-            return;
-        }
+        event.getDoer().peek(user -> {
+            Player player = Bukkit.getPlayer(user.getUUID());
+            if (player == null) {
+                return;
+            }
 
-        Player player = user.getPlayer().orNull();
-        if (player == null) {
-            return;
-        }
-
-        // Clear the current bossbar and refresh
-        bossBarManager.remove(player);
-        refreshPlayerDisplay(player, user);
+            // Clear the current bossbar and refresh
+            bossBarManager.remove(player);
+            refreshPlayerDisplay(player, user);
+        });
     }
 
     /**
