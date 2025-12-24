@@ -8,6 +8,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import pl.tenfajnybartek.funnyaddons.base.FunnyAddons;
 import pl.tenfajnybartek.funnyaddons.config.PanelConfig;
@@ -244,6 +246,18 @@ public class PanelGuiListener implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
+        UUID viewerId = event.getPlayer().getUniqueId();
+        GUIContext.unregisterAllPanelInventories(viewerId);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        UUID viewerId = event.getPlayer().getUniqueId();
+        GUIContext.unregisterAllPanelInventories(viewerId);
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
         UUID viewerId = event.getPlayer().getUniqueId();
         GUIContext.unregisterAllPanelInventories(viewerId);
     }

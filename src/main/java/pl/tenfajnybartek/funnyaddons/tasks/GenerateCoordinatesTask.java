@@ -15,9 +15,7 @@ public class GenerateCoordinatesTask implements Runnable {
     public GenerateCoordinatesTask(FunnyAddons addon) {
         this.addon = addon;
         this.config = addon.getConfigManager();
-        addon.getServer().getScheduler().runTaskTimerAsynchronously(
-                addon, this, 0L, config.getGenerationDelay() * 20L
-        );
+        // Usunięto scheduler z konstruktora - task jest uruchamiany w FunnyAddons.initAsyncTasks()
     }
 
     @Override

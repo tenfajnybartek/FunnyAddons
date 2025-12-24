@@ -18,12 +18,9 @@ import pl.tenfajnybartek.funnyaddons.utils.GUIHolder;
 import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 
 public class MemberPermissionsGUI {
-
-    private static final Logger LOGGER = Logger.getLogger("FunnyAddons");
 
     public static void open(Player opener, UUID memberUuid, String guildTag, PermissionsManager perms, FunnyAddons plugin) {
         ConfigManager cfg = plugin.getConfigManager();
@@ -70,7 +67,8 @@ public class MemberPermissionsGUI {
         for (PermissionType type : PermissionType.values()) {
             int slot = permCfg.getSlotFor(type);
             if (slot >= size) {
-                LOGGER.warning("[FunnyAddons] Permission " + type.name() + " has slot " + slot +
+                // Używamy plugin.getLogger() zamiast Logger.getLogger dla spójności
+                plugin.getLogger().warning("Permission " + type.name() + " has slot " + slot +
                         " configured, but GUI size is only " + size + ". Skipping this permission.");
                 continue;
             }

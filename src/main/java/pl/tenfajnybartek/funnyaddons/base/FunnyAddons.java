@@ -23,9 +23,9 @@ import pl.tenfajnybartek.funnyaddons.panel.PanelGuiListener;
 import pl.tenfajnybartek.funnyaddons.tasks.GenerateCoordinatesTask;
 import pl.tenfajnybartek.funnyaddons.utils.GuildTerrainBarRunnable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class FunnyAddons extends JavaPlugin {
 
@@ -34,7 +34,8 @@ public final class FunnyAddons extends JavaPlugin {
     private ConfigManager configManager;
     private GuildManager guildManager;
     private PermissionsManager permissionsManager;
-    private final List<Location> locationList = new ArrayList<>();
+    // Używamy CopyOnWriteArrayList dla bezpieczeństwa wątkowego przy modyfikacji z różnych tasków
+    private final List<Location> locationList = new CopyOnWriteArrayList<>();
 
     @Override
     public void onEnable() {
@@ -63,7 +64,7 @@ public final class FunnyAddons extends JavaPlugin {
         permissionsManager = new PermissionsManager(this);
 
         getServer().getPluginManager().registerEvents(new PermissionsGuiListener(permissionsManager, this), this);
-        getServer().getPluginManager().registerEvents(new PermissionsEnforceListener(permissionsManager), this);
+        getServer().getPluginManager().registerEvents(new PermissionsEnforceListener(permissionsManager, configManager), this);
     }
 
     private void initPanel() {
@@ -103,7 +104,8 @@ public final class FunnyAddons extends JavaPlugin {
     }
 
     private void initAsyncTasks() {
-        getServer().getScheduler().runTaskTimerAsynchronously(
+        // Task uruchamiany synchronicznie (nie async), ponieważ korzysta z Bukkit/FunnyGuilds API
+        getServer().getScheduler().runTaskTimer(
                 this,
                 new GenerateCoordinatesTask(this),
                 0L,
@@ -126,7 +128,8 @@ public final class FunnyAddons extends JavaPlugin {
         GuildTerrainBarRunnable terrainBarRunnable =
                 new GuildTerrainBarRunnable(configManager, playerPositionManager, bossBarManager);
 
-        getServer().getScheduler().runTaskTimerAsynchronously(
+        // Task uruchamiany synchronicznie (nie async), ponieważ BossBar i Player API są przeznaczone do głównego wątku
+        getServer().getScheduler().runTaskTimer(
                 this,
                 terrainBarRunnable,
                 configManager.getBossBarRunnableTime(),

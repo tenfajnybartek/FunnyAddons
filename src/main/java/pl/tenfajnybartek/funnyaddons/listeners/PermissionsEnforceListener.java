@@ -23,6 +23,8 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
+import pl.tenfajnybartek.funnyaddons.config.MessagesConfig;
+import pl.tenfajnybartek.funnyaddons.managers.ConfigManager;
 import pl.tenfajnybartek.funnyaddons.managers.PermissionsManager;
 import pl.tenfajnybartek.funnyaddons.utils.ChatUtils;
 import pl.tenfajnybartek.funnyaddons.utils.GUIHolder;
@@ -31,9 +33,11 @@ import pl.tenfajnybartek.funnyaddons.utils.PermissionType;
 public class PermissionsEnforceListener implements Listener {
 
     private final PermissionsManager perms;
+    private final MessagesConfig messages;
 
-    public PermissionsEnforceListener(PermissionsManager perms) {
+    public PermissionsEnforceListener(PermissionsManager perms, ConfigManager configManager) {
         this.perms = perms;
+        this.messages = configManager.getMessagesConfig();
     }
 
     private Guild getGuildAtLocation(org.bukkit.Location loc) {
@@ -67,7 +71,7 @@ public class PermissionsEnforceListener implements Listener {
         boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.BREAK);
         if (!allowed) {
             event.setCancelled(true);
-            ChatUtils.sendMessage(p, "&cNie masz uprawnień do niszczenia na terenie tej gildii!");
+            ChatUtils.sendMessage(p, messages.getPermsNoBreakMessage());
         }
     }
 
@@ -85,7 +89,7 @@ public class PermissionsEnforceListener implements Listener {
         boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.PLACE);
         if (!allowed) {
             event.setCancelled(true);
-            ChatUtils.sendMessage(p, "&cNie masz uprawnień do stawiania bloków na terenie tej gildii!");
+            ChatUtils.sendMessage(p, messages.getPermsNoPlaceMessage());
         }
     }
 
@@ -113,7 +117,7 @@ public class PermissionsEnforceListener implements Listener {
                 boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.OPEN_ENDER_CHEST);
                 if (!allowed) {
                     event.setCancelled(true);
-                    ChatUtils.sendMessage(p, "&cNie masz uprawnień do otwierania ender chesta na terenie tej gildii!");
+                    ChatUtils.sendMessage(p, messages.getPermsNoOpenEnderMessage());
                 }
                 return;
             }
@@ -121,7 +125,7 @@ public class PermissionsEnforceListener implements Listener {
             boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.OPEN_CHEST);
             if (!allowed) {
                 event.setCancelled(true);
-                ChatUtils.sendMessage(p, "&cNie masz uprawnień do otwierania skrzyń na terenie tej gildii!");
+                ChatUtils.sendMessage(p, messages.getPermsNoOpenChestMessage());
             }
         }
     }
@@ -144,7 +148,7 @@ public class PermissionsEnforceListener implements Listener {
                 boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.INTERACT_BLOCK);
                 if (!allowed) {
                     event.setCancelled(true);
-                    ChatUtils.sendMessage(p, "&cNie masz uprawnień do używania przycisków/dźwigni/drzwi na terenie tej gildii!");
+                    ChatUtils.sendMessage(p, messages.getPermsNoInteractMessage());
                     return;
                 }
             }
@@ -154,7 +158,7 @@ public class PermissionsEnforceListener implements Listener {
             boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.USE_FIRE);
             if (!allowed) {
                 event.setCancelled(true);
-                ChatUtils.sendMessage(p, "&cNie masz uprawnień do używania flinta i stali (odpalenie) na terenie tej gildii!");
+                ChatUtils.sendMessage(p, messages.getPermsNoFireMessage());
                 return;
             }
         }
@@ -174,7 +178,7 @@ public class PermissionsEnforceListener implements Listener {
         boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.USE_BUCKETS);
         if (!allowed) {
             event.setCancelled(true);
-            ChatUtils.sendMessage(p, "&cNie masz uprawnień do używania kubełków na terenie tej gildii!");
+            ChatUtils.sendMessage(p, messages.getPermsNoBucketsMessage());
         }
     }
 
@@ -190,7 +194,7 @@ public class PermissionsEnforceListener implements Listener {
         boolean allowed = perms.hasPermission(guild.getTag(), p.getUniqueId(), PermissionType.USE_BUCKETS);
         if (!allowed) {
             event.setCancelled(true);
-            ChatUtils.sendMessage(p, "&cNie masz uprawnień do używania kubełków na terenie tej gildii!");
+            ChatUtils.sendMessage(p, messages.getPermsNoBucketsMessage());
         }
     }
 
@@ -207,7 +211,7 @@ public class PermissionsEnforceListener implements Listener {
                 boolean allowed = perms.hasPermission(damGuild.getTag(), dam.getUniqueId(), PermissionType.FRIENDLY_FIRE);
                 if (!allowed) {
                     event.setCancelled(true);
-                    ChatUtils.sendMessage(dam, "&cNie możesz obrażać członków swojej gildii!");
+                    ChatUtils.sendMessage(dam, messages.getPermsNoFriendlyFireMessage());
                 }
             }
         }

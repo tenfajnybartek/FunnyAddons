@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import pl.tenfajnybartek.funnyaddons.base.FunnyAddons;
@@ -115,7 +117,28 @@ public class PermissionsGuiListener implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         UUID viewerId = event.getPlayer().getUniqueId();
+        cleanupGUIContext(viewerId);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        UUID viewerId = event.getPlayer().getUniqueId();
+        cleanupGUIContext(viewerId);
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        UUID viewerId = event.getPlayer().getUniqueId();
+        cleanupGUIContext(viewerId);
+    }
+
+    /**
+     * Czyści wszystkie konteksty GUI dla danego gracza.
+     * Wywoływane przy zamknięciu GUI, wyjściu z serwera lub wyrzuceniu.
+     */
+    private void cleanupGUIContext(UUID viewerId) {
         GUIContext.unregisterMembersInventory(viewerId);
         GUIContext.unregisterMemberPermissionsInventory(viewerId);
+        GUIContext.unregisterAllPanelInventories(viewerId);
     }
 }
