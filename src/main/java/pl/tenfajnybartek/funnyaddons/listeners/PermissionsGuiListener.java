@@ -133,12 +133,12 @@ public class PermissionsGuiListener implements Listener {
     }
 
     /**
-     * Czyści wszystkie konteksty GUI dla danego gracza.
+     * Czyści konteksty GUI uprawnień dla danego gracza.
      * Wywoływane przy zamknięciu GUI, wyjściu z serwera lub wyrzuceniu.
      */
     private void cleanupGUIContext(UUID viewerId) {
         GUIContext.unregisterMembersInventory(viewerId);
         GUIContext.unregisterMemberPermissionsInventory(viewerId);
-        GUIContext.unregisterAllPanelInventories(viewerId);
+        // Panel contexts are cleaned up by PanelGuiListener
     }
 }
